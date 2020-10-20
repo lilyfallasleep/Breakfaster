@@ -20,6 +20,14 @@ services:
     volumes:
       - ./sql/init.sql:/init.sql
       - data:/var/lib/mysql
+  redis:
+    container_name: redis-container
+    image: redis:latest
+    restart: always
+    hostname: redis
+    command: redis-server --port 6376
+    ports:
+        - "6376:6376"
   web:
     build: ./app
     restart: always
