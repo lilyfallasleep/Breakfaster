@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>領餐系統</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="row">
+      <div class="col-sm-8 border-right p-0">
+        <div
+          id="input-area"
+          class="border-bottom d-flex flex-column justify-content-center align-items-center"
+        >
+          <h1>請輸入員工編號或掃描員工證</h1>
+          <div class="input-group input-group-lg px-5 mt-5">
+            <input
+              placeholder="LWXXXXX/掃描證件"
+              type="text"
+              class="form-control text-center"
+              name="eid"
+              id="eid"
+              maxlength="10"
+            />
+          </div>
+        </div>
+        <div
+          id="show-area"
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          <h3></h3>
+          <h1 class="text-center" id="order-name"></h1>
+        </div>
+      </div>
+      <div class="col-sm-4 table-area border">
+        <table class="table table-hover" id="history-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">員工編號</th>
+              <th scope="col">餐點</th>
+              <th scope="col">時間</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
+    <script src="script.js"></script>
+  </body>
+</html>

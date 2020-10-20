@@ -1,0 +1,564 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Breakfast Ordering System @LINE",
+        "title": "Breakfaster",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/employee": {
+            "post": {
+                "description": "Insert an employee. If the employee ID or line UID exists, update the corresponding field",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee"
+                ],
+                "summary": "Insert an employee by employee ID and line UID",
+                "parameters": [
+                    {
+                        "description": "Add Employee",
+                        "name": "employee",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.PostEmployee"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.SuccessMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/employee/emp-id": {
+            "get": {
+                "description": "Get employee ID by querying employee line UID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee"
+                ],
+                "summary": "Get employee ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Employee Line UID",
+                        "name": "line-uid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.JSONEmployee"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/employee/line-uid": {
+            "get": {
+                "description": "Get employee line UID by querying employee ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee"
+                ],
+                "summary": "Get employee line UID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Employee ID",
+                        "name": "emp-id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.JSONEmployee"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/foods": {
+            "get": {
+                "description": "Retrieve foods for each day in the given time interval",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Food"
+                ],
+                "summary": "Get all foods",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date in format YYYY-MM-DD",
+                        "name": "start",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date in format YYYY-MM-DD",
+                        "name": "end",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schema.NestedFood"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/next-week": {
+            "get": {
+                "description": "Get the starting and ending date of next week (in local time)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Time"
+                ],
+                "summary": "Get next week date interval",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.JSONTimeInterval"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/order": {
+            "get": {
+                "description": "Get an order by employee ID / access card number and date",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Get an order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Query type; should be 'eid' or 'card'",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Payload",
+                        "name": "payload",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date in format YYYY-MM-DD",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.JSONOrder"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/order/pick": {
+            "put": {
+                "description": "Pick an order, setting the picked status true",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Pick an order",
+                "parameters": [
+                    {
+                        "description": "Pick Order",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.PutPickOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.SuccessMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/orders": {
+            "post": {
+                "description": "Create orders of next week for an employee. Overwite an order if it already exists",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Create orders for an employee",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Line UID Authorization",
+                        "name": "X-Line-Identifer",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add Orders",
+                        "name": "orders",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.AllOrders"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.SuccessMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/common.ErrResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "common.ErrResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "common.SuccessMessage": {
+            "type": "object",
+            "properties": {
+                "msg": {
+                    "type": "string",
+                    "example": "ok"
+                }
+            }
+        },
+        "schema.AllOrders": {
+            "type": "object",
+            "required": [
+                "emp_id",
+                "foods"
+            ],
+            "properties": {
+                "emp_id": {
+                    "type": "string",
+                    "example": "LW99999"
+                },
+                "foods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Order"
+                    }
+                }
+            }
+        },
+        "schema.JSONEmployee": {
+            "type": "object",
+            "properties": {
+                "emp_id": {
+                    "type": "string",
+                    "example": "LW99999"
+                },
+                "line_uid": {
+                    "type": "string",
+                    "example": "U6664ceab1f4466b30827d936cee888e6"
+                }
+            }
+        },
+        "schema.JSONFood": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "burger"
+                },
+                "picurl": {
+                    "type": "string",
+                    "example": "www.example.com"
+                },
+                "supplier": {
+                    "type": "string",
+                    "example": "McDonald"
+                }
+            }
+        },
+        "schema.JSONOrder": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "example": "2020-09-01"
+                },
+                "emp_id": {
+                    "type": "string",
+                    "example": "LW99999"
+                },
+                "food_name": {
+                    "type": "string",
+                    "example": "burger"
+                },
+                "pick": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "schema.JSONTimeInterval": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "string",
+                    "example": "2020-09-05"
+                },
+                "start": {
+                    "type": "string",
+                    "example": "2020-09-01"
+                }
+            }
+        },
+        "schema.NestedFood": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/schema.JSONFood"
+                }
+            }
+        },
+        "schema.Order": {
+            "type": "object",
+            "required": [
+                "date",
+                "food_id"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "example": "2020-09-01"
+                },
+                "food_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "schema.PostEmployee": {
+            "type": "object",
+            "required": [
+                "emp_id",
+                "line_uid"
+            ],
+            "properties": {
+                "emp_id": {
+                    "type": "string",
+                    "example": "LW99999"
+                },
+                "line_uid": {
+                    "type": "string",
+                    "example": "U6664ceab1f4466b30827d936cee888e6"
+                }
+            }
+        },
+        "schema.PutPickOrder": {
+            "type": "object",
+            "required": [
+                "date",
+                "emp_id"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "example": "2020-09-01"
+                },
+                "emp_id": {
+                    "type": "string",
+                    "example": "LW99999"
+                }
+            }
+        }
+    }
+}

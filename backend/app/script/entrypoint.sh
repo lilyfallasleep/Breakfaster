@@ -1,0 +1,2 @@
+./breakfaster migrate
+./breakfaster serve

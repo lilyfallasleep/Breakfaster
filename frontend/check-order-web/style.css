@@ -1,0 +1,45 @@
+body {
+  height: 100vh;
+}
+
+#input-area,
+#show-area {
+  height: 50vh;
+  width: 100%;
+}
+
+#history-table {
+  width: 100%;
+}
+
+input {
+  font-size: 2rem !important;
+}
+
+input.invalid,
+input.invalid:focus {
+  border-color: #dc3545;
+}
+
+input.invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+input.valid,
+input.valid:focus {
+  border-color: #28a745;
+}
+
+input.valid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+#order-name {
+  font-size: 5rem;
+  letter-spacing: 1.5rem;
+}
+
+.table-area {
+  height: 100vh;
+  overflow-y: auto;
+}

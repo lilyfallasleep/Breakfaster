@@ -1,0 +1,378 @@
+definitions:
+  common.ErrResponse:
+    properties:
+      code:
+        type: integer
+      msg:
+        type: string
+    type: object
+  common.SuccessMessage:
+    properties:
+      msg:
+        example: ok
+        type: string
+    type: object
+  schema.AllOrders:
+    properties:
+      emp_id:
+        example: LW99999
+        type: string
+      foods:
+        items:
+          $ref: '#/definitions/schema.Order'
+        type: array
+    required:
+    - emp_id
+    - foods
+    type: object
+  schema.JSONEmployee:
+    properties:
+      emp_id:
+        example: LW99999
+        type: string
+      line_uid:
+        example: U6664ceab1f4466b30827d936cee888e6
+        type: string
+    type: object
+  schema.JSONFood:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: burger
+        type: string
+      picurl:
+        example: www.example.com
+        type: string
+      supplier:
+        example: McDonald
+        type: string
+    type: object
+  schema.JSONOrder:
+    properties:
+      date:
+        example: "2020-09-01"
+        type: string
+      emp_id:
+        example: LW99999
+        type: string
+      food_name:
+        example: burger
+        type: string
+      pick:
+        example: false
+        type: boolean
+    type: object
+  schema.JSONTimeInterval:
+    properties:
+      end:
+        example: "2020-09-05"
+        type: string
+      start:
+        example: "2020-09-01"
+        type: string
+    type: object
+  schema.NestedFood:
+    additionalProperties:
+      items:
+        $ref: '#/definitions/schema.JSONFood'
+      type: array
+    type: object
+  schema.Order:
+    properties:
+      date:
+        example: "2020-09-01"
+        type: string
+      food_id:
+        example: 1
+        type: integer
+    required:
+    - date
+    - food_id
+    type: object
+  schema.PostEmployee:
+    properties:
+      emp_id:
+        example: LW99999
+        type: string
+      line_uid:
+        example: U6664ceab1f4466b30827d936cee888e6
+        type: string
+    required:
+    - emp_id
+    - line_uid
+    type: object
+  schema.PutPickOrder:
+    properties:
+      date:
+        example: "2020-09-01"
+        type: string
+      emp_id:
+        example: LW99999
+        type: string
+    required:
+    - date
+    - emp_id
+    type: object
+info:
+  contact: {}
+  description: Breakfast Ordering System @LINE
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Breakfaster
+  version: 1.0.0
+paths:
+  /api/v1/employee:
+    post:
+      description: Insert an employee. If the employee ID or line UID exists, update the corresponding field
+      parameters:
+      - description: Add Employee
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/schema.PostEmployee'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Insert an employee by employee ID and line UID
+      tags:
+      - Employee
+  /api/v1/employee/emp-id:
+    get:
+      description: Get employee ID by querying employee line UID
+      parameters:
+      - description: Employee Line UID
+        in: query
+        name: line-uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.JSONEmployee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Get employee ID
+      tags:
+      - Employee
+  /api/v1/employee/line-uid:
+    get:
+      description: Get employee line UID by querying employee ID
+      parameters:
+      - description: Employee ID
+        in: query
+        name: emp-id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.JSONEmployee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Get employee line UID
+      tags:
+      - Employee
+  /api/v1/foods:
+    get:
+      description: Retrieve foods for each day in the given time interval
+      parameters:
+      - description: Start date in format YYYY-MM-DD
+        in: query
+        name: start
+        required: true
+        type: string
+      - description: End date in format YYYY-MM-DD
+        in: query
+        name: end
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schema.NestedFood'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Get all foods
+      tags:
+      - Food
+  /api/v1/next-week:
+    get:
+      description: Get the starting and ending date of next week (in local time)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.JSONTimeInterval'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Get next week date interval
+      tags:
+      - Time
+  /api/v1/order:
+    get:
+      description: Get an order by employee ID / access card number and date
+      parameters:
+      - description: Query type; should be 'eid' or 'card'
+        in: query
+        name: type
+        required: true
+        type: string
+      - description: Payload
+        in: query
+        name: payload
+        required: true
+        type: string
+      - description: Date in format YYYY-MM-DD
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.JSONOrder'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Get an order
+      tags:
+      - Order
+  /api/v1/order/pick:
+    put:
+      description: Pick an order, setting the picked status true
+      parameters:
+      - description: Pick Order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/schema.PutPickOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Pick an order
+      tags:
+      - Order
+  /api/v1/orders:
+    post:
+      description: Create orders of next week for an employee. Overwite an order if it already exists
+      parameters:
+      - description: Line UID Authorization
+        in: header
+        name: X-Line-Identifer
+        required: true
+        type: string
+      - description: Add Orders
+        in: body
+        name: orders
+        required: true
+        schema:
+          $ref: '#/definitions/schema.AllOrders'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.SuccessMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/common.ErrResponse'
+      summary: Create orders for an employee
+      tags:
+      - Order
+swagger: "2.0"
