@@ -14,17 +14,18 @@ import (
 // OrderService provides methods for manipulating orders
 type OrderService struct {
 	orderRepository *dao.OrderRepository
-	empRepository   *dao.EmployeeRepository
+	empSvc          *EmployeeService
 	bot             *mybot.BreakFaster
 	timer           *ordertime.OrderTimer
 }
 
 // SendOrderConfirmMessage sends an order confirmation message to the employee
 func (svc *OrderService) SendOrderConfirmMessage(empID string, start, end time.Time) error {
-	lineUID, err := svc.empRepository.GetLineUID(empID)
+	employee, err := svc.empSvc.GetEmployeeByEmpID(empID)
 	if err != nil {
 		return exc.ErrGetlineUIDWhenConfirm
 	}
+	lineUID := (*employee).LineUID
 	confirmCard, err := svc.bot.NewConfirmCard(lineUID, start, end)
 	if err != nil {
 		return exc.ErrGetOrderWhenConfirm
@@ -116,11 +117,11 @@ func (svc *OrderService) SetPick(empID string, rawDate string) error {
 }
 
 // NewOrderService is the factory for OrderService
-func NewOrderService(orderRepository *dao.OrderRepository, empRepository *dao.EmployeeRepository,
+func NewOrderService(orderRepository *dao.OrderRepository, empSvc *EmployeeService,
 	bot *mybot.BreakFaster, timer *ordertime.OrderTimer) *OrderService {
 	return &OrderService{
 		orderRepository: orderRepository,
-		empRepository:   empRepository,
+		empSvc:          empSvc,
 		bot:             bot,
 		timer:           timer,
 	}
