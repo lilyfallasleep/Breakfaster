@@ -8,13 +8,14 @@ import (
 	"breakfaster/service/constant"
 	ss "breakfaster/service/schema"
 	"fmt"
+	"log"
 	"time"
 )
 
 // FoodService provides methods for manipulating foods
 type FoodService struct {
 	repository *dao.FoodRepository
-	cache      cache.GeneralCache
+	cache      *cache.RedisCache
 }
 
 const (
@@ -41,8 +42,12 @@ func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, e
 	}
 
 	foodsCacheKey := getFoodsCacheKey(startDate, endDate)
-	if nestedFood, found := svc.cache.Get(foodsCacheKey); found {
-		return nestedFood.(*ss.NestedFood), nil
+	nestedFood := make(ss.NestedFood)
+	found, err := svc.cache.Get(foodsCacheKey, &nestedFood)
+	if err != nil {
+		log.Print(err)
+	} else if found {
+		return &nestedFood, nil
 	}
 
 	foods, err = svc.repository.GetFoodAll(start, end)
@@ -50,7 +55,6 @@ func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, e
 		return &ss.NestedFood{}, err
 	}
 
-	nestedFood := make(ss.NestedFood)
 	for _, food := range *foods {
 		datetime := food.SupplyDatetime.Format(constant.DateFormat)
 		nestedFood[datetime] = append(nestedFood[datetime], ss.JSONFood{
@@ -60,13 +64,15 @@ func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, e
 			PicURL:   food.PicURL,
 		})
 	}
-	svc.cache.Set(foodsCacheKey, &nestedFood)
+	if err := svc.cache.Set(foodsCacheKey, &nestedFood); err != nil {
+		log.Print(err)
+	}
 
 	return &nestedFood, nil
 }
 
 // NewFoodService is the factory for FoodService
-func NewFoodService(repository *dao.FoodRepository, cache cache.GeneralCache) *FoodService {
+func NewFoodService(repository *dao.FoodRepository, cache *cache.RedisCache) *FoodService {
 	return &FoodService{
 		repository: repository,
 		cache:      cache,

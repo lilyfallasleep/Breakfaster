@@ -19,4 +19,11 @@ export CLEAN_CACHE_INTERVAL=86400
 export CLOVA_SECRET_KEY=myClovaSecretKey
 export CLOVA_BUILDER_URL=https://myClovaChatBotEndpoint
 
+export REDIS_ADDR=redis-node1:7000
+export REDIS_PASSWD=pass.123
+export REDIS_POOL_SIZE=10
+export REDIS_MAX_RETRIES=3
+export REDIS_IDLE_TIMEOUT=60
+export REDIS_CLUSTER_IP=$(ifconfig | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}" \
+    | grep -v 127.0.0.1 | awk '{ print $2 }' | cut -f2 -d: | head -n1)
 docker-compose up

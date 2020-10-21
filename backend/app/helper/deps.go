@@ -22,8 +22,9 @@ func BuildContainer() *dig.Container {
 
 	container.Provide(c.NewConfig)
 
-	container.Provide(db.ConnectDatabase)
+	container.Provide(db.NewDatabaseConnection)
 	container.Provide(cache.NewMemCache)
+	container.Provide(cache.NewRedisCache)
 
 	container.Provide(dao.NewFoodRepository)
 	container.Provide(dao.NewOrderRepository)

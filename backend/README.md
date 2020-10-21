@@ -16,9 +16,10 @@ You can visit `http://<host-ip:port>/api/v1/doc/index.html` for API documentatio
 ## Model Training
 On the Clova ChatBot dashboard, create a numbers of question-answer pairs. Current answers should include: `問題回報`, `取消訂單`, `點餐紀錄`, `規則`. See more details in [Chat Bot Custom API Documentation](https://apidocs.ncloud.com/en/ai-application-service/chatbot/chatbot/).
 ## Development
-For development, you can start the DB container only by executing:
+For development, you can start the DB and Redis containers only by executing:
 ```bash
-docker-compose up db
+docker-compose up db redis-cluster-creator \
+    redis-node1 redis-node2 redis-node3 redis-node4 redis-node5 redis-node6
 ```
 
-The database will be serving on `127.0.0.1:3306`. You can then set env `DB_DSN=<user>:<password>@tcp(127.0.0.1:3306)/breakfaster?charset=utf8mb4&parseTime=True&loc=Local` and connect to the database.
+MySQL database will be serving on `127.0.0.1:3306`. You can then set env `DB_DSN=<user>:<password>@tcp(127.0.0.1:3306)/breakfaster?charset=utf8mb4&parseTime=True&loc=Local` and connect to MySQL. Also, the Redis cluster will be serving on `REDIS_CLUSTER_IP:7000` to `REDIS_CLUSTER_IP:7005`. You can connect to the cluster via any one of the 6 Redis nodes.

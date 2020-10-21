@@ -20,14 +20,76 @@ services:
     volumes:
       - ./sql/init.sql:/init.sql
       - data:/var/lib/mysql
-  redis:
-    container_name: redis-container
-    image: redis:latest
-    restart: always
-    hostname: redis
-    command: redis-server --port 6376
+  redis-node1:
+    build:
+      context: redis
     ports:
-        - "6376:6376"
+      - "7000:7000"
+      - "17000:17000"
+    restart: always
+    entrypoint: [redis-server, /etc/redis/rediscluster.conf, --port,"7000", --cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
+  redis-node2:
+    build:
+      context: redis
+    ports:
+      - "7001:7001"
+      - "17001:17001"
+    restart: always
+    entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7001",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
+  redis-node3:
+    build:
+      context: redis
+    ports:
+      - "7002:7002"
+      - "17002:17002"
+    restart: always
+    entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7002",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
+  redis-node4:
+    build:
+      context: redis
+    ports:
+      - "7003:7003"
+      - "17003:17003"
+    restart: always
+    entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7003",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+  redis-node5:
+    build:
+      context: redis
+    ports:
+      - "7004:7004"
+      - "17004:17004"
+    restart: always
+    entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7004",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+  redis-node6:
+    build:
+      context: redis
+    ports:
+      - "7005:7005"
+      - "17005:17005"
+    restart: always
+    entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7005",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+  redis-cluster-creator:
+    image: redis:latest
+    entrypoint: [/bin/sh,-c,'echo "yes" | redis-cli -a ${REDIS_PASSWD} --cluster create ${REDIS_CLUSTER_IP}:7000 ${REDIS_CLUSTER_IP}:7001 ${REDIS_CLUSTER_IP}:7002 ${REDIS_CLUSTER_IP}:7003 ${REDIS_CLUSTER_IP}:7004 ${REDIS_CLUSTER_IP}:7005 --cluster-replicas 1']
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
+      - redis-node6
   web:
     build: ./app
     restart: always
@@ -46,6 +108,11 @@ services:
       CLEAN_CACHE_INTERVAL: ${CLEAN_CACHE_INTERVAL}
       CLOVA_SECRET_KEY: ${CLOVA_SECRET_KEY}
       CLOVA_BUILDER_URL: ${CLOVA_BUILDER_URL}
+      REDIS_ADDR: ${REDIS_ADDR}
+      REDIS_PASSWD: ${REDIS_PASSWD}
+      REDIS_POOL_SIZE: ${REDIS_POOL_SIZE}
+      REDIS_MAX_RETRIES: ${REDIS_MAX_RETRIES}
+      REDIS_IDLE_TIMEOUT: ${REDIS_IDLE_TIMEOUT}
     ports:
       - 80:${PORT}
     depends_on:

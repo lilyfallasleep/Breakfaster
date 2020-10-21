@@ -5,20 +5,36 @@ import (
 	"breakfaster/repository/dao"
 	"breakfaster/repository/model"
 	ss "breakfaster/service/schema"
+	"log"
 )
 
 // EmployeeService provides methods for manipulating employees
 type EmployeeService struct {
 	repository *dao.EmployeeRepository
-	cache      cache.GeneralCache
+	cache      *cache.RedisCache
 }
 
 // GetEmployeeByLineUID service queries employee by line UID
 func (svc *EmployeeService) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmployee, error) {
-	empID, err := svc.repository.GetEmpID(lineUID)
+	var empID string
+	found, err := svc.cache.Get(lineUID, &empID)
+	if err != nil {
+		log.Print(err)
+	} else if found {
+		return &ss.JSONEmployee{
+			EmpID:   empID,
+			LineUID: lineUID,
+		}, nil
+	}
+
+	empID, err = svc.repository.GetEmpID(lineUID)
 	if err != nil {
 		return &ss.JSONEmployee{}, err
 	}
+	if err := svc.cache.Set(lineUID, empID); err != nil {
+		log.Print(err)
+	}
+
 	return &ss.JSONEmployee{
 		EmpID:   empID,
 		LineUID: lineUID,
@@ -27,17 +43,24 @@ func (svc *EmployeeService) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmploy
 
 // GetEmployeeByEmpID service queries employee by employee ID
 func (svc *EmployeeService) GetEmployeeByEmpID(empID string) (*ss.JSONEmployee, error) {
-	if lineUID, found := svc.cache.Get(empID); found {
+	var lineUID string
+	found, err := svc.cache.Get(empID, &lineUID)
+	if err != nil {
+		log.Print(err)
+	} else if found {
 		return &ss.JSONEmployee{
 			EmpID:   empID,
-			LineUID: lineUID.(string),
+			LineUID: lineUID,
 		}, nil
 	}
-	lineUID, err := svc.repository.GetLineUID(empID)
+
+	lineUID, err = svc.repository.GetLineUID(empID)
 	if err != nil {
 		return &ss.JSONEmployee{}, err
 	}
-	svc.cache.Set(empID, lineUID)
+	if err := svc.cache.Set(empID, lineUID); err != nil {
+		log.Print(err)
+	}
 
 	return &ss.JSONEmployee{
 		EmpID:   empID,
@@ -54,12 +77,29 @@ func (svc *EmployeeService) UpsertEmployeeByIDs(empID, lineUID string) error {
 	if err := svc.repository.UpsertEmployeeByIDs(employee); err != nil {
 		return err
 	}
-	svc.cache.Delete(empID)
+
+	cmds := []cache.Cmd{
+		cache.Cmd{
+			OpType: cache.DELETE,
+			Payload: cache.RedisDeletePayload{
+				Key: empID,
+			},
+		},
+		cache.Cmd{
+			OpType: cache.DELETE,
+			Payload: cache.RedisDeletePayload{
+				Key: lineUID,
+			},
+		},
+	}
+	if err := svc.cache.ExecPipeLine(&cmds); err != nil {
+		log.Print(err)
+	}
 	return nil
 }
 
 // NewEmployeeService is the factory for EmployeeService
-func NewEmployeeService(repository *dao.EmployeeRepository, cache cache.GeneralCache) *EmployeeService {
+func NewEmployeeService(repository *dao.EmployeeRepository, cache *cache.RedisCache) *EmployeeService {
 	return &EmployeeService{
 		repository: repository,
 		cache:      cache,

@@ -32,4 +32,7 @@ var (
 
 	// Message errors
 	ErrSendMsg = errors.New("server error while sending message")
+
+	// Redis errors
+	ErrRedisCmdNotFound = errors.New("redis command not foundl supports SET and DELETE")
 )

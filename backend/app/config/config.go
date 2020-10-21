@@ -30,6 +30,7 @@ type Config struct {
 	CleanCacheInterval     time.Duration
 	ClovaSecretKey         string
 	ClovaBuilderURL        string
+	RedisConfig            *RedisConfig
 }
 
 // NewConfig is a factory for Config instance
@@ -47,6 +48,19 @@ func NewConfig() (*Config, error) {
 		return &Config{}, err
 	}
 	cleanCacheInterval, err := strconv.ParseInt(GetEnvWithDefault("CLEAN_CACHE_INTERVAL", "600"), 10, 64)
+	if err != nil {
+		return &Config{}, err
+	}
+	redisDB, err := strconv.Atoi(GetEnvWithDefault("REDIS_DB", "0"))
+	redisPoolSize, err := strconv.Atoi(GetEnvWithDefault("REDIS_POOL_SIZE", "10"))
+	if err != nil {
+		return &Config{}, err
+	}
+	redisMaxRetries, err := strconv.Atoi(GetEnvWithDefault("REDIS_MAX_RETRIES", "3"))
+	if err != nil {
+		return &Config{}, err
+	}
+	redisIdleTimeout, err := strconv.ParseInt(GetEnvWithDefault("REDIS_IDLE_TIMEOUT", "60"), 10, 64)
 	if err != nil {
 		return &Config{}, err
 	}
@@ -76,5 +90,13 @@ func NewConfig() (*Config, error) {
 		CleanCacheInterval:     time.Duration(cleanCacheInterval) * time.Second,
 		ClovaSecretKey:         os.Getenv("CLOVA_SECRET_KEY"),
 		ClovaBuilderURL:        os.Getenv("CLOVA_BUILDER_URL"),
+		RedisConfig: &RedisConfig{
+			Addr:        os.Getenv("REDIS_ADDR"),
+			Password:    GetEnvWithDefault("REDIS_PASSWD", ""),
+			DB:          redisDB,
+			PoolSize:    redisPoolSize,
+			MaxRetries:  redisMaxRetries,
+			IdleTimeout: time.Duration(redisIdleTimeout) * time.Second,
+		},
 	}, nil
 }

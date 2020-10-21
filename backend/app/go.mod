@@ -6,6 +6,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/swag v0.19.9 // indirect
+	github.com/go-redis/redis/v8 v8.3.2
 	github.com/line/line-bot-sdk-go v7.5.0+incompatible
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -15,7 +16,6 @@ require (
 	go.uber.org/dig v1.10.0
 	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
 	golang.org/x/tools v0.0.0-20201015182029-a5d9e455e9c4 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gorm.io/driver/mysql v1.0.1
 	gorm.io/gorm v1.20.1
 )
