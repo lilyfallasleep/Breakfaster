@@ -19,37 +19,37 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
     volumes:
       - ./sql/init.sql:/init.sql
-      - data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
   redis-node1:
     build:
       context: redis
     ports:
-      - "7000:7000"
-      - "17000:17000"
+      - 7000:7000
+      - 17000:17000
     restart: always
     entrypoint: [redis-server, /etc/redis/rediscluster.conf, --port,"7000", --cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
   redis-node2:
     build:
       context: redis
     ports:
-      - "7001:7001"
-      - "17001:17001"
+      - 7001:7001
+      - 17001:17001
     restart: always
     entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7001",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
   redis-node3:
     build:
       context: redis
     ports:
-      - "7002:7002"
-      - "17002:17002"
+      - 7002:7002
+      - 17002:17002
     restart: always
     entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7002",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
   redis-node4:
     build:
       context: redis
     ports:
-      - "7003:7003"
-      - "17003:17003"
+      - 7003:7003
+      - 17003:17003
     restart: always
     entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7003",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
     depends_on:
@@ -60,8 +60,8 @@ services:
     build:
       context: redis
     ports:
-      - "7004:7004"
-      - "17004:17004"
+      - 7004:7004
+      - 17004:17004
     restart: always
     entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7004",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
     depends_on:
@@ -72,8 +72,8 @@ services:
     build:
       context: redis
     ports:
-      - "7005:7005"
-      - "17005:17005"
+      - 7005:7005
+      - 17005:17005
     restart: always
     entrypoint: [redis-server, /etc/redis/rediscluster.conf,--port,"7005",--cluster-announce-ip,"${REDIS_CLUSTER_IP}"]
     depends_on:
@@ -117,6 +117,35 @@ services:
       - 80:${PORT}
     depends_on:
       - db
+  prometheus:
+    image: prom/prometheus:v2.1.0
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./prometheus/alert_rules.yaml:/etc/prometheus/alert_rules.yaml
+    command: --config.file=/etc/prometheus/prometheus.yaml
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=pass
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/alertmanager.yaml/:/etc/alertmanager/alertmanager.yaml
+    restart: always
+    command: --config.file=/etc/alertmanager/alertmanager.yaml
+             --storage.path=/alertmanager
 
 volumes:
-  data:
+  mysql_data:
+  prometheus_data:
+  grafana_data:
