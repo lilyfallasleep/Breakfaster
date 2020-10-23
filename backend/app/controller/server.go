@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -30,6 +31,7 @@ func NewEngine(config *c.Config) *gin.Engine {
 
 	engine := gin.Default()
 	engine.Use(middleware.CORSMiddleware())
+	engine.Use(middleware.PromMiddleware())
 	return engine
 }
 
@@ -47,6 +49,8 @@ func NewServer(config *c.Config, engine *gin.Engine, auth *middleware.AuthChecke
 
 // RegisterRoutes method register all endpoints and returns a router
 func (s *Server) RegisterRoutes() {
+	s.engine.GET("/metrics", middleware.PromHandler(promhttp.Handler()))
+
 	botGroup := s.engine.Group("/")
 	{
 		botGroup.POST("/callback", gin.WrapF(s.routers[s.config.BotVersion].(*(rv1.Router)).Bot.Callback))
