@@ -5,11 +5,11 @@ import (
 	"breakfaster/controller/v1/middleware"
 	rv1 "breakfaster/controller/v1/router"
 	"io"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -26,10 +26,17 @@ type Server struct {
 // Global Middlewares and api log configurations are registered here
 func NewEngine(config *c.Config) *gin.Engine {
 	gin.SetMode(config.GinMode)
+	if config.GinMode == "release" {
+		log.SetLevel(log.InfoLevel)
+	} else {
+		log.SetLevel(log.DebugLevel)
+	}
 	gin.DefaultWriter = io.MultiWriter(config.Logger.Writer)
 	log.SetOutput(gin.DefaultWriter)
 
-	engine := gin.Default()
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+	engine.Use(middleware.JSONLogMiddleware())
 	engine.Use(middleware.CORSMiddleware())
 	engine.Use(middleware.PromMiddleware())
 	return engine
@@ -49,7 +56,7 @@ func NewServer(config *c.Config, engine *gin.Engine, auth *middleware.AuthChecke
 
 // RegisterRoutes method register all endpoints and returns a router
 func (s *Server) RegisterRoutes() {
-	s.engine.GET("/metrics", middleware.PromHandler(promhttp.Handler()))
+	//s.engine.GET("/metrics", middleware.PromHandler(promhttp.Handler()))
 
 	botGroup := s.engine.Group("/")
 	{

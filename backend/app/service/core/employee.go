@@ -1,17 +1,20 @@
 package core
 
 import (
+	"breakfaster/config"
 	"breakfaster/infrastructure/cache"
 	"breakfaster/repository/dao"
 	"breakfaster/repository/model"
 	ss "breakfaster/service/schema"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // EmployeeService provides methods for manipulating employees
 type EmployeeService struct {
 	repository *dao.EmployeeRepository
 	cache      *cache.RedisCache
+	logger     *log.Entry
 }
 
 // GetEmployeeByLineUID service queries employee by line UID
@@ -19,7 +22,7 @@ func (svc *EmployeeService) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmploy
 	var empID string
 	found, err := svc.cache.Get(lineUID, &empID)
 	if err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	} else if found {
 		return &ss.JSONEmployee{
 			EmpID:   empID,
@@ -32,7 +35,7 @@ func (svc *EmployeeService) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmploy
 		return &ss.JSONEmployee{}, err
 	}
 	if err := svc.cache.Set(lineUID, empID); err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	}
 
 	return &ss.JSONEmployee{
@@ -46,7 +49,7 @@ func (svc *EmployeeService) GetEmployeeByEmpID(empID string) (*ss.JSONEmployee, 
 	var lineUID string
 	found, err := svc.cache.Get(empID, &lineUID)
 	if err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	} else if found {
 		return &ss.JSONEmployee{
 			EmpID:   empID,
@@ -59,7 +62,7 @@ func (svc *EmployeeService) GetEmployeeByEmpID(empID string) (*ss.JSONEmployee, 
 		return &ss.JSONEmployee{}, err
 	}
 	if err := svc.cache.Set(empID, lineUID); err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	}
 
 	return &ss.JSONEmployee{
@@ -93,15 +96,18 @@ func (svc *EmployeeService) UpsertEmployeeByIDs(empID, lineUID string) error {
 		},
 	}
 	if err := svc.cache.ExecPipeLine(&cmds); err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	}
 	return nil
 }
 
 // NewEmployeeService is the factory for EmployeeService
-func NewEmployeeService(repository *dao.EmployeeRepository, cache *cache.RedisCache) *EmployeeService {
+func NewEmployeeService(repository *dao.EmployeeRepository, cache *cache.RedisCache, config *config.Config) *EmployeeService {
 	return &EmployeeService{
 		repository: repository,
 		cache:      cache,
+		logger: config.Logger.ContextLogger.WithFields(log.Fields{
+			"type": "svc:employee",
+		}),
 	}
 }

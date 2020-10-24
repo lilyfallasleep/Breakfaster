@@ -1,8 +1,6 @@
 package stat
 
 import (
-	"log"
-
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
@@ -31,18 +29,18 @@ func (d *Disk) Usage() float64 {
 	return float64(d.Used) / float64(d.Total)
 }
 
-// Server is the machine stat type
-type Server struct {
-	CPU
-	Mem
-	Disk
+// ServerStat is the machine stat type
+type ServerStat struct {
+	*CPU
+	*Mem
+	*Disk
 }
 
 // CalCPUUsage calculates CPU usage
-func CalCPUUsage() CPU {
+func CalCPUUsage() (*CPU, error) {
 	stat, err := linuxproc.ReadStat("/proc/stat")
 	if err != nil {
-		log.Fatal("stat read fail")
+		return &CPU{}, err
 	}
 	var st CPU
 	for _, s := range stat.CPUStats {
@@ -51,28 +49,48 @@ func CalCPUUsage() CPU {
 		st.System += s.System
 		st.Idle += s.Idle
 	}
-	return st
+	return &st, nil
 }
 
 // CalMemUsage calculates memory usage
-func CalMemUsage() Mem {
+func CalMemUsage() (*Mem, error) {
 	stat, err := linuxproc.ReadMemInfo("/proc/meminfo")
 	if err != nil {
-		log.Fatal("stat read fail")
+		return &Mem{}, err
 	}
-	return Mem{Used: stat.MemTotal - stat.MemAvailable, Available: stat.MemAvailable, Total: stat.MemTotal}
+	return &Mem{
+		Used:      stat.MemTotal - stat.MemAvailable,
+		Available: stat.MemAvailable,
+		Total:     stat.MemTotal,
+	}, nil
 }
 
 // CalDiskUsage calculates disk usage
-func CalDiskUsage() Disk {
+func CalDiskUsage() (*Disk, error) {
 	stat, err := linuxproc.ReadDisk("/")
 	if err != nil {
-		log.Fatal("stat read fail")
+		return &Disk{}, err
 	}
-	return Disk{Used: stat.Used, Total: stat.All}
+	return &Disk{Used: stat.Used, Total: stat.All}, nil
 }
 
-// GetServer returns a server instance for machine stat
-func GetServer() *Server {
-	return &Server{CalCPUUsage(), CalMemUsage(), CalDiskUsage()}
+// GetServerStat returns a server instance for machine stat
+func GetServerStat() (*ServerStat, error) {
+	var cpu *CPU
+	var mem *Mem
+	var disk *Disk
+	var err error
+	cpu, err = CalCPUUsage()
+	if err != nil {
+		return nil, err
+	}
+	mem, err = CalMemUsage()
+	if err != nil {
+		return nil, err
+	}
+	disk, err = CalDiskUsage()
+	if err != nil {
+		return nil, err
+	}
+	return &ServerStat{cpu, mem, disk}, nil
 }

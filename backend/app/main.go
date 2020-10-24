@@ -5,7 +5,6 @@ import (
 	_ "breakfaster/docs"
 	"breakfaster/helper"
 	"fmt"
-	"log"
 	"os"
 
 	"gorm.io/gorm"
@@ -33,16 +32,16 @@ func main() {
 			server.Run()
 		})
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	case "send":
 		err := container.Invoke(func(server *controller.Server) {
 			if err := server.BroadCastMenu(); err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 		})
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	case "migrate":
 		err := container.Invoke(func(db *gorm.DB) {
@@ -52,17 +51,20 @@ func main() {
 				ID:       1,
 				FoodName: constant.DummyFoodName,
 			}).Error; err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 		})
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	case "dropallorder":
-		container.Invoke(func(db *gorm.DB) {
+		err := container.Invoke(func(db *gorm.DB) {
 			db.Migrator().DropTable(&model.Order{})
 			db.AutoMigrate(&model.Order{})
 		})
+		if err != nil {
+			fmt.Println(err)
+		}
 	default:
 		fmt.Println("expected 'serve', 'send', 'migrate', or 'dropallorder' subcommands")
 		os.Exit(1)

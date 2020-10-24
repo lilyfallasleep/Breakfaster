@@ -1,20 +1,22 @@
 package dao
 
 import (
+	"breakfaster/config"
 	exc "breakfaster/pkg/exception"
 	"breakfaster/repository/model"
 	"breakfaster/repository/schema"
 	"errors"
-	"log"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 // OrderRepository provides operations on order model
 type OrderRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	logger *log.Entry
 }
 
 // CreateOrders creates an entry in orders table
@@ -24,7 +26,7 @@ func (repo *OrderRepository) CreateOrders(orders *[]model.Order) error {
 		Columns:   []clause.Column{{Name: "primary"}},
 		DoUpdates: clause.AssignmentColumns([]string{"food_id", "updated_at", "created_at"}),
 	}).Create(orders).Error; err != nil {
-		log.Print(err)
+		repo.logger.Error(err)
 		return exc.ErrCreateOrder
 	}
 	return nil
@@ -35,7 +37,7 @@ func (repo *OrderRepository) DeleteOrdersByLineUID(lineUID string, start, end ti
 	subQuery := repo.db.Table("employees").Select("emp_id").Where("line_uid = ?", lineUID)
 	if err := repo.db.Where("date BETWEEN ? AND ?", start, end).
 		Where("employee_emp_id = (?)", subQuery).Delete(model.Order{}).Error; err != nil {
-		log.Print(err)
+		repo.logger.Error(err)
 		return exc.ErrDeleteOrder
 	}
 	return nil
@@ -48,7 +50,7 @@ func (repo *OrderRepository) GetOrdersByLineUID(lineUID string, start, end time.
 		Joins("left join foods on foods.id = orders.food_id").
 		Joins("left join employees on employees.emp_id = orders.employee_emp_id").
 		Where("date BETWEEN ? AND ?", start, end).Where("employees.line_uid = ?", lineUID).Scan(&orders).Error; err != nil {
-		log.Print(err)
+		repo.logger.Error(err)
 		return &[]schema.SelectOrder{}, exc.ErrGetOrder
 	}
 	return &orders, nil
@@ -63,7 +65,7 @@ func (repo *OrderRepository) GetOrderByEmpID(empID string, date time.Time) (*sch
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrOrderNotFound
 		}
-		log.Print(err)
+		repo.logger.Error(err)
 		return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrGetOrder
 	}
 	return &order, nil
@@ -79,7 +81,7 @@ func (repo *OrderRepository) GetOrderByAccessCardNumber(accessCardNumber string,
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrOrderNotFound
 		}
-		log.Print(err)
+		repo.logger.Error(err)
 		return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrGetOrder
 	}
 	return &order, nil
@@ -89,13 +91,18 @@ func (repo *OrderRepository) GetOrderByAccessCardNumber(accessCardNumber string,
 func (repo *OrderRepository) UpdateOrderStatus(empID string, date time.Time, pick bool) error {
 	if err := repo.db.Model(&model.Order{}).Where("employee_emp_id = ? AND date = ?", empID, date).
 		Updates(model.Order{Pick: pick, PickUpAt: time.Now().Unix()}).Error; err != nil {
-		log.Print(err)
+		repo.logger.Error(err)
 		return exc.ErrUpdateOrderStatus
 	}
 	return nil
 }
 
 // NewOrderRepository is the factory for OrderRepository
-func NewOrderRepository(db *gorm.DB) *OrderRepository {
-	return &OrderRepository{db: db}
+func NewOrderRepository(db *gorm.DB, config *config.Config) *OrderRepository {
+	return &OrderRepository{
+		db: db,
+		logger: config.Logger.ContextLogger.WithFields(log.Fields{
+			"type": "dao:order",
+		}),
+	}
 }

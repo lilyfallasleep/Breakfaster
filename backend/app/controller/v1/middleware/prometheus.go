@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 )
 
 const namespace = ""
@@ -90,13 +91,20 @@ var (
 // init registers the prometheus metrics
 func init() {
 	prometheus.MustRegister(uptime, reqCount, reqCountPerEndpoint, userCPU, systemCPU, memUsage, diskUsage)
-	go recordServerMetrics()
+	initStat, err := stat.GetServerStat()
+	if err != nil {
+		log.Error(err)
+	}
+	go recordServerMetrics(initStat)
 }
 
-func recordServerMetrics() {
-	prev := stat.GetServer()
+func recordServerMetrics(prev *stat.ServerStat) {
 	for range time.Tick(time.Second) {
-		cur := stat.GetServer()
+		cur, err := stat.GetServerStat()
+		if err != nil {
+			log.Error(err)
+			return
+		}
 		cpuTotal := float64(cur.CPU.Total - prev.CPU.Total)
 		uptime.WithLabelValues().Inc()
 		userCPU.WithLabelValues().Set(float64(cur.CPU.User-prev.CPU.User) / cpuTotal * 100)
@@ -158,7 +166,7 @@ func PromMiddleware() gin.HandlerFunc {
 	}
 }
 
-// PromHandler return http handler for prometheus
+// PromHandler returns http handler for prometheus
 func PromHandler(handler http.Handler) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		handler.ServeHTTP(c.Writer, c.Request)

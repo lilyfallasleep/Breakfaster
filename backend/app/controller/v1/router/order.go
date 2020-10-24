@@ -5,7 +5,6 @@ import (
 	cs "breakfaster/controller/v1/schema"
 	exc "breakfaster/pkg/exception"
 	ss "breakfaster/service/schema"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -116,7 +115,6 @@ func (r *Router) CreateOrders(c *gin.Context) {
 func (r *Router) SetPick(c *gin.Context) {
 	var pickOrder cs.PutPickOrder
 	if err := c.ShouldBindJSON(&pickOrder); err != nil {
-		log.Print(err)
 		com.Response(c, http.StatusBadRequest, exc.ErrInvalidParamCode, exc.ErrInvalidParam)
 		return
 	}

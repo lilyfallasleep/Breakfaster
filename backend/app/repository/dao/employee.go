@@ -1,19 +1,21 @@
 package dao
 
 import (
+	"breakfaster/config"
 	exc "breakfaster/pkg/exception"
 	"breakfaster/repository/model"
 	"breakfaster/repository/schema"
 	"errors"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 // EmployeeRepository provides operations on employee model
 type EmployeeRepository struct {
-	db *gorm.DB
+	db     *gorm.DB
+	logger *log.Entry
 }
 
 // GetEmpID queries employee ID by line UID
@@ -23,7 +25,7 @@ func (repo *EmployeeRepository) GetEmpID(lineUID string) (string, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", exc.ErrEmployeeNotFound
 		}
-		log.Print(err)
+		repo.logger.Error(err)
 		return "", exc.ErrGetEmployee
 	}
 	return employee.EmpID, nil
@@ -36,7 +38,7 @@ func (repo *EmployeeRepository) GetLineUID(EmpID string) (string, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", exc.ErrEmployeeNotFound
 		}
-		log.Print(err)
+		repo.logger.Error(err)
 		return "", exc.ErrGetEmployee
 	}
 	return employee.LineUID, nil
@@ -51,13 +53,18 @@ func (repo *EmployeeRepository) UpsertEmployeeByIDs(employee *model.Employee) er
 		Columns:   []clause.Column{{Name: "line_uid"}, {Name: "emp_id"}},
 		DoUpdates: clause.AssignmentColumns([]string{"line_uid", "emp_id", "updated_at", "created_at"}),
 	}).Create(employee).Error; err != nil {
-		log.Print(err)
+		repo.logger.Error(err)
 		return exc.ErrUpsertEmployeeIDs
 	}
 	return nil
 }
 
 // NewEmployeeRepository is the factory for EmployeeRepository
-func NewEmployeeRepository(db *gorm.DB) *EmployeeRepository {
-	return &EmployeeRepository{db: db}
+func NewEmployeeRepository(db *gorm.DB, config *config.Config) *EmployeeRepository {
+	return &EmployeeRepository{
+		db: db,
+		logger: config.Logger.ContextLogger.WithFields(log.Fields{
+			"type": "dao:employee",
+		}),
+	}
 }

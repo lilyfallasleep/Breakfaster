@@ -1,8 +1,6 @@
 package mybot
 
 import (
-	"log"
-
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -37,7 +35,7 @@ func (app *BreakFaster) nextStep(replyToken string, source *linebot.EventSource,
 			return err
 		}
 	default:
-		log.Printf("Unknown action: %v", data)
+		app.logger.Errorf("Unknown action: %v", data)
 	}
 	return nil
 }

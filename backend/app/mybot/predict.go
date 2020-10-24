@@ -1,9 +1,5 @@
 package mybot
 
-import (
-	"log"
-)
-
 // Predict returns message according to the given prediction
 func (app *BreakFaster) Predict(replyToken, lineUID, text string) error {
 	prediction, err := app.ar.Predict(text)
@@ -18,7 +14,7 @@ func (app *BreakFaster) Predict(replyToken, lineUID, text string) error {
 		}
 	case "取消訂單":
 		if err := app.replyCancelConfirmBox(replyToken); err != nil {
-			log.Print(err)
+			return err
 		}
 	case "點餐紀錄":
 		start, end := app.timer.GetNextWeekInterval()

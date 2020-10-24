@@ -1,7 +1,6 @@
 package mybot
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -11,7 +10,7 @@ import (
 func (app *BreakFaster) Callback(w http.ResponseWriter, r *http.Request) {
 	events, err := app.bot.ParseRequest(r)
 	if err != nil {
-		log.Print(err)
+		app.logger.Error(err)
 		if err == linebot.ErrInvalidSignature {
 			w.WriteHeader(400)
 		} else {
@@ -28,37 +27,37 @@ func (app *BreakFaster) Callback(w http.ResponseWriter, r *http.Request) {
 				switch message.Text {
 				case "點餐":
 					if err := app.replyFlex(event.ReplyToken, "操作選單", app.NewMenu, false); err != nil {
-						log.Print(err)
+						app.logger.Error(err)
 					}
 				case "點餐紀錄":
 					start, end := app.timer.GetNextWeekInterval()
 					if err := app.replyOrderConfirmCard(event.ReplyToken, event.Source.UserID, start, end); err != nil {
-						log.Print(err)
+						app.logger.Error(err)
 					}
 				case "取消訂單":
 					if err := app.replyCancelConfirmBox(event.ReplyToken); err != nil {
-						log.Print(err)
+						app.logger.Error(err)
 					}
 				default:
 					if err := app.Predict(event.ReplyToken, event.Source.UserID, message.Text); err != nil {
-						log.Print(err)
+						app.logger.Error(err)
 					}
 				}
 			default:
-				log.Printf("Unknown message: %v", message)
+				app.logger.Errorf("Unknown message: %v", message)
 			}
 		case linebot.EventTypeFollow:
 			if err := app.replyFlex(event.ReplyToken, "點餐規則", app.NewWelcomeCard, false); err != nil {
-				log.Print(err)
+				app.logger.Error(err)
 			}
 		case linebot.EventTypePostback:
 			data := event.Postback.Data
 
 			if err := app.nextStep(event.ReplyToken, event.Source, data); err != nil {
-				log.Print(err)
+				app.logger.Error(err)
 			}
 		default:
-			log.Printf("Unknown event: %v", event)
+			app.logger.Errorf("Unknown event: %v", event)
 		}
 	}
 }

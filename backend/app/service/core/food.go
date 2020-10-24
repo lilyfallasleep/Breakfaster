@@ -1,6 +1,7 @@
 package core
 
 import (
+	"breakfaster/config"
 	"breakfaster/infrastructure/cache"
 	exc "breakfaster/pkg/exception"
 	"breakfaster/repository/dao"
@@ -8,14 +9,16 @@ import (
 	"breakfaster/service/constant"
 	ss "breakfaster/service/schema"
 	"fmt"
-	"log"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // FoodService provides methods for manipulating foods
 type FoodService struct {
 	repository *dao.FoodRepository
 	cache      *cache.RedisCache
+	logger     *log.Entry
 }
 
 const (
@@ -45,7 +48,7 @@ func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, e
 	nestedFood := make(ss.NestedFood)
 	found, err := svc.cache.Get(foodsCacheKey, &nestedFood)
 	if err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	} else if found {
 		return &nestedFood, nil
 	}
@@ -65,16 +68,19 @@ func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, e
 		})
 	}
 	if err := svc.cache.Set(foodsCacheKey, &nestedFood); err != nil {
-		log.Print(err)
+		svc.logger.Error(err)
 	}
 
 	return &nestedFood, nil
 }
 
 // NewFoodService is the factory for FoodService
-func NewFoodService(repository *dao.FoodRepository, cache *cache.RedisCache) *FoodService {
+func NewFoodService(repository *dao.FoodRepository, cache *cache.RedisCache, config *config.Config) *FoodService {
 	return &FoodService{
 		repository: repository,
 		cache:      cache,
+		logger: config.Logger.ContextLogger.WithFields(log.Fields{
+			"type": "svc:food",
+		}),
 	}
 }

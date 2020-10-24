@@ -67,7 +67,8 @@ func NewConfig() (*Config, error) {
 
 	ginMode := GetEnvWithDefault("GIN_MODE", "debug")
 	logPath := GetEnvWithDefault("LOG_PATH", "server.log")
-	logger, err := getLogger(ginMode, logPath)
+	appName := GetEnvWithDefault("APP_NAME", "breakfaster")
+	logger, err := getLogger(ginMode, logPath, appName)
 	if err != nil {
 		return &Config{}, err
 	}

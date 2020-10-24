@@ -5,10 +5,11 @@ import (
 	"breakfaster/pkg/ordertime"
 	"breakfaster/repository/dao"
 
-	"github.com/line/line-bot-sdk-go/linebot"
-
 	c "breakfaster/config"
 	"breakfaster/infrastructure/cache"
+
+	"github.com/line/line-bot-sdk-go/linebot"
+	log "github.com/sirupsen/logrus"
 )
 
 // BreakFaster is the type for bot
@@ -19,6 +20,7 @@ type BreakFaster struct {
 	orderRepo    *dao.OrderRepository
 	timer        *ordertime.OrderTimer
 	OrderPageURI string
+	logger       *log.Entry
 }
 
 // NewBreakFaster is a factory for bot instance
@@ -38,5 +40,8 @@ func NewBreakFaster(config *c.Config, ar *autoreply.AutoReplier, msgCache cache.
 		orderRepo:    orderRepo,
 		timer:        timer,
 		OrderPageURI: config.OrderPageURI,
+		logger: config.Logger.ContextLogger.WithFields(log.Fields{
+			"type": "bot",
+		}),
 	}, nil
 }

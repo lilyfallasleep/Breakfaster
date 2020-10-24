@@ -2,7 +2,6 @@ package db
 
 import (
 	c "breakfaster/config"
-	"log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,12 +13,10 @@ func NewDatabaseConnection(config *c.Config) (*gorm.DB, error) {
 		Logger: config.Logger.DBLogger,
 	})
 	if err != nil {
-		log.Print(err)
 		return &gorm.DB{}, err
 	}
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Print(err)
 		return &gorm.DB{}, err
 	}
 	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
@@ -27,5 +24,6 @@ func NewDatabaseConnection(config *c.Config) (*gorm.DB, error) {
 
 	// SetMaxOpenConns sets the maximum number of open connections to the database.
 	sqlDB.SetMaxOpenConns(config.DBconfig.MaxOpenConns)
+	config.Logger.ContextLogger.WithField("type", "setup:db").Info("successful SQL connection")
 	return db, nil
 }

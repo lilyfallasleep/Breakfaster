@@ -95,6 +95,7 @@ services:
     restart: always
     environment:
       PORT: ${PORT}
+      APP_NAME: ${APP_NAME}
       CHANNEL_SECRET: ${CHANNEL_SECRET}
       ACCESS_TOKEN: ${ACCESS_TOKEN}
       BOT_VERSION: ${BOT_VERSION}

@@ -5,6 +5,7 @@ export DB_ROOT_PASSWD=password
 export DB_NAME=breakfaster
 
 export PORT=80
+export APP_NAME=breakfaster
 export CHANNEL_SECRET=myLineBotChannelSecret
 export ACCESS_TOKEN=myLineBotAccessToken
 export BOT_VERSION=v1

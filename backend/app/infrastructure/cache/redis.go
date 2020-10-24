@@ -5,7 +5,6 @@ import (
 	exc "breakfaster/pkg/exception"
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -77,10 +76,9 @@ func NewRedisCache(config *c.Config) (*RedisCache, error) {
 	ctx := context.Background()
 	pong, err := client.Ping(ctx).Result()
 	if err == redis.Nil || err != nil {
-		log.Print(err)
 		return nil, err
 	}
-	log.Print("successful Redis Connection: " + pong)
+	config.Logger.ContextLogger.WithField("type", "setup:redis").Info("successful Redis Connection: " + pong)
 	return &RedisCache{
 		client:     client,
 		ctx:        ctx,
