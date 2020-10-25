@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	log.SetFormatter(&log.JSONFormatter{})
+	log.SetFormatter(&log.TextFormatter{FullTimestamp: true, DisableColors: true})
 }
 
 // Logger is the logger type
