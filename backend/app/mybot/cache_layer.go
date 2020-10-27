@@ -5,10 +5,10 @@ import (
 )
 
 func (app *BreakFaster) cacheWrapper(key string, fallbackFunc func() linebot.FlexContainer) linebot.FlexContainer {
-	if flexMsg, found := app.msgCache.Get(key); found {
+	if flexMsg, found := app.svc.msgCache.Get(key); found {
 		return flexMsg.(linebot.FlexContainer)
 	}
 	flexMsg := fallbackFunc()
-	app.msgCache.Set(key, flexMsg)
+	app.svc.msgCache.Set(key, flexMsg)
 	return flexMsg
 }

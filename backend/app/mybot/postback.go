@@ -7,7 +7,7 @@ import (
 func (app *BreakFaster) nextStep(replyToken string, source *linebot.EventSource, data string) error {
 	switch data {
 	case "check_order":
-		start, end := app.timer.GetNextWeekInterval()
+		start, end := app.svc.timer.GetNextWeekInterval()
 		confirmCard, err := app.NewConfirmCard(source.UserID, start, end)
 		if err != nil {
 			return err
@@ -19,8 +19,8 @@ func (app *BreakFaster) nextStep(replyToken string, source *linebot.EventSource,
 			return err
 		}
 	case "cancel_order":
-		start, end := app.timer.GetNextWeekInterval()
-		if err := app.orderRepo.DeleteOrdersByLineUID(source.UserID, start, end); err != nil {
+		start, end := app.svc.timer.GetNextWeekInterval()
+		if err := app.svc.orderRepo.DeleteOrdersByLineUID(source.UserID, start, end); err != nil {
 			return err
 		}
 		if err := app.replyText(replyToken, "訂單已取消😎"); err != nil {
@@ -31,11 +31,11 @@ func (app *BreakFaster) nextStep(replyToken string, source *linebot.EventSource,
 			return err
 		}
 	case "rule":
-		if err := app.replyFlex(replyToken, "點餐規則", app.NewWelcomeCard, false); err != nil {
+		if err := app.replyFlex(replyToken, "點餐規則", NewWelcomeCard, false); err != nil {
 			return err
 		}
 	default:
-		app.logger.Errorf("Unknown action: %v", data)
+		app.svc.logger.Errorf("Unknown action: %v", data)
 	}
 	return nil
 }

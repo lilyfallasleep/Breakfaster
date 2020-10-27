@@ -7,6 +7,7 @@ import (
 	rv1 "breakfaster/controller/v1/router"
 	"breakfaster/infrastructure/cache"
 	"breakfaster/infrastructure/db"
+	"breakfaster/messaging"
 	"breakfaster/mybot"
 	"breakfaster/mybot/autoreply"
 	"breakfaster/pkg/ordertime"
@@ -36,8 +37,13 @@ func BuildContainer() *dig.Container {
 
 	container.Provide(ordertime.NewOrderTimer)
 
+	container.Provide(mybot.NewLineBot)
 	container.Provide(mybot.NewBreakFaster)
+	container.Provide(mybot.NewBreakFastPusher)
+	container.Provide(mybot.NewWebhookService)
 	container.Provide(autoreply.NewAutoReplier)
+
+	container.Provide(messaging.NewMessage)
 
 	container.Provide(rv1.NewRouter)
 	container.Provide(middleware.NewAuthChecker)

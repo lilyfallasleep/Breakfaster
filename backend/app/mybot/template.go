@@ -166,13 +166,13 @@ func IntPtr(v int) *int {
 }
 
 // NewWelcomeCard is a factory for welcome message
-func (app *BreakFaster) NewWelcomeCard() linebot.FlexContainer {
+func NewWelcomeCard() linebot.FlexContainer {
 	content, _ := linebot.UnmarshalFlexMessageJSON([]byte(welcomeCard))
 	return content
 }
 
 // NewMenu is a factory for menu message
-func (app *BreakFaster) NewMenu() linebot.FlexContainer {
+func NewMenu() linebot.FlexContainer {
 	menu := &linebot.BubbleContainer{
 		Type: linebot.FlexContainerTypeBubble,
 		Hero: &linebot.ImageComponent{
@@ -181,7 +181,7 @@ func (app *BreakFaster) NewMenu() linebot.FlexContainer {
 			Size:        linebot.FlexImageSizeTypeFull,
 			AspectRatio: linebot.FlexImageAspectRatioType20to13,
 			AspectMode:  linebot.FlexImageAspectModeTypeCover,
-			Action:      &linebot.URIAction{URI: app.OrderPageURI},
+			Action:      &linebot.URIAction{URI: OrderPageURI},
 		},
 		Body: &linebot.BoxComponent{
 			Type:    linebot.FlexComponentTypeBox,
@@ -198,7 +198,7 @@ func (app *BreakFaster) NewMenu() linebot.FlexContainer {
 					Type: linebot.FlexComponentTypeButton,
 					Action: &linebot.URIAction{
 						Label: "來點早餐吧",
-						URI:   app.OrderPageURI,
+						URI:   OrderPageURI,
 					},
 					Margin: "xl",
 					Style:  "primary",
@@ -227,7 +227,7 @@ func (app *BreakFaster) NewMenu() linebot.FlexContainer {
 					Type: linebot.FlexComponentTypeButton,
 					Action: &linebot.URIAction{
 						Label: "問題回報",
-						URI:   app.OrderPageURI + "/report",
+						URI:   OrderPageURI + "/report",
 					},
 					Style: "primary",
 					Color: "#8C8C8C",
@@ -241,7 +241,7 @@ func (app *BreakFaster) NewMenu() linebot.FlexContainer {
 
 // NewConfirmCard is a factory for order confirmation message
 func (app *BreakFaster) NewConfirmCard(lineUID string, start, end time.Time) (linebot.FlexContainer, error) {
-	orders, err := app.orderRepo.GetOrdersByLineUID(lineUID, start, end)
+	orders, err := app.svc.orderRepo.GetOrdersByLineUID(lineUID, start, end)
 	if err != nil {
 		return &linebot.BubbleContainer{}, err
 	}
@@ -336,7 +336,7 @@ func (app *BreakFaster) NewConfirmCard(lineUID string, start, end time.Time) (li
 					Type: linebot.FlexComponentTypeButton,
 					Action: &linebot.URIAction{
 						Label: "重新點餐",
-						URI:   app.OrderPageURI,
+						URI:   OrderPageURI,
 					},
 					Style: "primary",
 					Color: "#05A66B",

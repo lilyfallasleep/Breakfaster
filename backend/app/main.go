@@ -4,6 +4,7 @@ import (
 	"breakfaster/controller"
 	_ "breakfaster/docs"
 	"breakfaster/helper"
+	"breakfaster/messaging"
 	"fmt"
 	"os"
 
@@ -27,18 +28,18 @@ func main() {
 	container := helper.BuildContainer()
 
 	switch os.Args[1] {
-	case "serve":
-		err := container.Invoke(func(server *controller.Server) {
-			server.Run()
+	case "send":
+		err := container.Invoke(func(message *messaging.Message) {
+			if err := message.BroadCastMenu(); err != nil {
+				fmt.Println(err)
+			}
 		})
 		if err != nil {
 			fmt.Println(err)
 		}
-	case "send":
+	case "serve":
 		err := container.Invoke(func(server *controller.Server) {
-			if err := server.BroadCastMenu(); err != nil {
-				fmt.Println(err)
-			}
+			server.Run()
 		})
 		if err != nil {
 			fmt.Println(err)

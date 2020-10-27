@@ -97,11 +97,3 @@ func (s *Server) Run() {
 	Addr := ":" + s.config.Port
 	s.engine.Run(Addr)
 }
-
-// BroadCastMenu is a method for broadcasting breakfast menu
-func (s *Server) BroadCastMenu() error {
-	if err := s.routers[s.config.BotVersion].(*(rv1.Router)).BroadCastMenu(); err != nil {
-		return err
-	}
-	return nil
-}

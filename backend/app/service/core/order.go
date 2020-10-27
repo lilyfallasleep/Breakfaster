@@ -16,6 +16,7 @@ type OrderService struct {
 	orderRepository *dao.OrderRepository
 	empSvc          *EmployeeService
 	bot             *mybot.BreakFaster
+	pusher          *mybot.BreakFastPusher
 	timer           *ordertime.OrderTimer
 }
 
@@ -30,7 +31,7 @@ func (svc *OrderService) SendOrderConfirmMessage(empID string, start, end time.T
 	if err != nil {
 		return exc.ErrGetOrderWhenConfirm
 	}
-	if err := svc.bot.SendDirectFlex(lineUID, "確認訂單", confirmCard); err != nil {
+	if err := svc.pusher.SendDirectFlex(lineUID, "確認訂單", confirmCard); err != nil {
 		return exc.ErrSendMsg
 	}
 	return nil
@@ -118,11 +119,12 @@ func (svc *OrderService) SetPick(empID string, rawDate string) error {
 
 // NewOrderService is the factory for OrderService
 func NewOrderService(orderRepository *dao.OrderRepository, empSvc *EmployeeService,
-	bot *mybot.BreakFaster, timer *ordertime.OrderTimer) *OrderService {
+	bot *mybot.BreakFaster, pusher *mybot.BreakFastPusher, timer *ordertime.OrderTimer) *OrderService {
 	return &OrderService{
 		orderRepository: orderRepository,
 		empSvc:          empSvc,
 		bot:             bot,
+		pusher:          pusher,
 		timer:           timer,
 	}
 }
