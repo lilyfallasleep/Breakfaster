@@ -4,7 +4,6 @@ import (
 	"breakfaster/controller"
 	_ "breakfaster/docs"
 	"breakfaster/helper"
-	"breakfaster/messaging"
 	"fmt"
 	"os"
 
@@ -22,21 +21,12 @@ import (
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("expected 'serve', 'send', 'migrate', or 'dropallorder' subcommands")
+		fmt.Println("expected 'serve', 'migrate', or 'dropallorder' subcommands")
 		os.Exit(1)
 	}
 	container := helper.BuildContainer()
 
 	switch os.Args[1] {
-	case "send":
-		err := container.Invoke(func(message *messaging.Message) {
-			if err := message.BroadCastMenu(); err != nil {
-				fmt.Println(err)
-			}
-		})
-		if err != nil {
-			fmt.Println(err)
-		}
 	case "serve":
 		err := container.Invoke(func(server *controller.Server) {
 			server.Run()

@@ -6,6 +6,7 @@ import (
 	rv1 "breakfaster/controller/v1/router"
 	"io"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
@@ -56,7 +57,7 @@ func NewServer(config *c.Config, engine *gin.Engine, auth *middleware.AuthChecke
 
 // RegisterRoutes method register all endpoints and returns a router
 func (s *Server) RegisterRoutes() {
-	//s.engine.GET("/metrics", middleware.PromHandler(promhttp.Handler()))
+	s.engine.GET("/metrics", middleware.PromHandler(promhttp.Handler()))
 
 	botGroup := s.engine.Group("/")
 	{

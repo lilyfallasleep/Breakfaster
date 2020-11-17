@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 )
 
-func (ar *AutoReplier) generateSignature(requestBody []byte) (string, error) {
+func (ar *AutoReplierImpl) generateSignature(requestBody []byte) (string, error) {
 	hash := hmac.New(sha256.New, []byte(ar.secretKey))
 
 	// hash body with secret key

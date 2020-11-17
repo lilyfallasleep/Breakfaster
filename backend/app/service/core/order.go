@@ -11,17 +11,17 @@ import (
 	"time"
 )
 
-// OrderService provides methods for manipulating orders
-type OrderService struct {
-	orderRepository *dao.OrderRepository
-	empSvc          *EmployeeService
+// OrderServiceImpl provides methods for manipulating orders
+type OrderServiceImpl struct {
+	orderRepository dao.OrderRepository
+	empSvc          EmployeeService
 	bot             *mybot.BreakFaster
 	pusher          *mybot.BreakFastPusher
-	timer           *ordertime.OrderTimer
+	timer           ordertime.OrderTimer
 }
 
 // SendOrderConfirmMessage sends an order confirmation message to the employee
-func (svc *OrderService) SendOrderConfirmMessage(empID string, start, end time.Time) error {
+func (svc *OrderServiceImpl) SendOrderConfirmMessage(empID string, start, end time.Time) error {
 	employee, err := svc.empSvc.GetEmployeeByEmpID(empID)
 	if err != nil {
 		return exc.ErrGetlineUIDWhenConfirm
@@ -38,7 +38,7 @@ func (svc *OrderService) SendOrderConfirmMessage(empID string, start, end time.T
 }
 
 // CreateOrders service inserts orders from an employee
-func (svc *OrderService) CreateOrders(rawOrders *ss.AllOrders) error {
+func (svc *OrderServiceImpl) CreateOrders(rawOrders *ss.AllOrders) error {
 	var orders []model.Order
 	for _, rawOrder := range rawOrders.Foods {
 		supplyDatetime, err := time.ParseInLocation(constant.DateFormat, rawOrder.Date, time.Local)
@@ -64,7 +64,7 @@ func (svc *OrderService) CreateOrders(rawOrders *ss.AllOrders) error {
 }
 
 // GetOrderByEmpID service retrieves a daily order by employee ID
-func (svc *OrderService) GetOrderByEmpID(empID, rawDate string) (*ss.JSONOrder, error) {
+func (svc *OrderServiceImpl) GetOrderByEmpID(empID, rawDate string) (*ss.JSONOrder, error) {
 	var date time.Time
 	var err error
 	date, err = time.ParseInLocation(constant.DateFormat, rawDate, time.Local)
@@ -85,7 +85,7 @@ func (svc *OrderService) GetOrderByEmpID(empID, rawDate string) (*ss.JSONOrder, 
 }
 
 // GetOrderByAccessCardNumber service retrieves a daily order by employee ID
-func (svc *OrderService) GetOrderByAccessCardNumber(accessCardNumber, rawDate string) (*ss.JSONOrder, error) {
+func (svc *OrderServiceImpl) GetOrderByAccessCardNumber(accessCardNumber, rawDate string) (*ss.JSONOrder, error) {
 	var date time.Time
 	var err error
 	date, err = time.ParseInLocation(constant.DateFormat, rawDate, time.Local)
@@ -106,7 +106,7 @@ func (svc *OrderService) GetOrderByAccessCardNumber(accessCardNumber, rawDate st
 }
 
 // SetPick service sets the pick status of an order to true
-func (svc *OrderService) SetPick(empID string, rawDate string) error {
+func (svc *OrderServiceImpl) SetPick(empID string, rawDate string) error {
 	date, err := time.ParseInLocation(constant.DateFormat, rawDate, time.Local)
 	if err != nil {
 		return exc.ErrDateFormat
@@ -117,10 +117,10 @@ func (svc *OrderService) SetPick(empID string, rawDate string) error {
 	return nil
 }
 
-// NewOrderService is the factory for OrderService
-func NewOrderService(orderRepository *dao.OrderRepository, empSvc *EmployeeService,
-	bot *mybot.BreakFaster, pusher *mybot.BreakFastPusher, timer *ordertime.OrderTimer) *OrderService {
-	return &OrderService{
+// NewOrderService is the factory for OrderServiceImpl
+func NewOrderService(orderRepository dao.OrderRepository, empSvc EmployeeService,
+	bot *mybot.BreakFaster, pusher *mybot.BreakFastPusher, timer ordertime.OrderTimer) OrderService {
+	return &OrderServiceImpl{
 		orderRepository: orderRepository,
 		empSvc:          empSvc,
 		bot:             bot,

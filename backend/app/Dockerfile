@@ -18,7 +18,7 @@ RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 
 RUN mkdir -p /app
 WORKDIR /app
-COPY --from=builder /app/breakfaster /app/script/entrypoint.sh /app/script/wait-for-it.sh ./
+COPY --from=builder /app/cmd/server/breakfaster /app/script/entrypoint.sh /app/script/wait-for-it.sh ./
 RUN apk add --no-cache bash
 RUN chmod +x wait-for-it.sh entrypoint.sh
 

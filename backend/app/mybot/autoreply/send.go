@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (ar *AutoReplier) sendRequest(body *ClovaRequest) (*ClovaResponse, error) {
+func (ar *AutoReplierImpl) sendRequest(body *ClovaRequest) (*ClovaResponse, error) {
 	var jsonstr []byte
 	var signature string
 	var err error

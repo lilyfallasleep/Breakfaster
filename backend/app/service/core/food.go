@@ -14,9 +14,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// FoodService provides methods for manipulating foods
-type FoodService struct {
-	repository *dao.FoodRepository
+// FoodServiceImpl provides methods for manipulating foods
+type FoodServiceImpl struct {
+	repository dao.FoodRepository
 	cache      *cache.RedisCache
 	logger     *log.Entry
 }
@@ -30,7 +30,7 @@ func getFoodsCacheKey(startDate, endDate string) string {
 }
 
 // GetFoodAll returns all foods between the given date (includingly)
-func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, error) {
+func (svc *FoodServiceImpl) GetFoodAll(startDate, endDate string) (*ss.NestedFood, error) {
 	var err error
 	var start, end time.Time
 	var foods *[]rs.SelectFood
@@ -74,9 +74,9 @@ func (svc *FoodService) GetFoodAll(startDate, endDate string) (*ss.NestedFood, e
 	return &nestedFood, nil
 }
 
-// NewFoodService is the factory for FoodService
-func NewFoodService(repository *dao.FoodRepository, cache *cache.RedisCache, config *config.Config) *FoodService {
-	return &FoodService{
+// NewFoodService is the factory for FoodServiceImpl
+func NewFoodService(repository dao.FoodRepository, cache *cache.RedisCache, config *config.Config) FoodService {
+	return &FoodServiceImpl{
 		repository: repository,
 		cache:      cache,
 		logger: config.Logger.ContextLogger.WithFields(log.Fields{

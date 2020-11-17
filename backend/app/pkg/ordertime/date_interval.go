@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-// OrderTimer is the timer type for getting order date interval
-type OrderTimer struct{}
+// OrderTimerImpl is the timer type for getting order date interval
+type OrderTimerImpl struct{}
 
-func (svc *OrderTimer) getNextMonday() time.Time {
+func getNextMonday() time.Time {
 	t := time.Now()
 	cur := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Local)
 	if cur.Weekday() == time.Monday {
@@ -20,13 +20,13 @@ func (svc *OrderTimer) getNextMonday() time.Time {
 }
 
 // GetNextWeekInterval service returns the next week time interval
-func (svc *OrderTimer) GetNextWeekInterval() (time.Time, time.Time) {
-	start := svc.getNextMonday()
+func (svc *OrderTimerImpl) GetNextWeekInterval() (time.Time, time.Time) {
+	start := getNextMonday()
 	end := start.AddDate(0, 0, 4)
 	return start, end
 }
 
-// NewOrderTimer is the factory for OrderTimer instance
-func NewOrderTimer() *OrderTimer {
-	return &OrderTimer{}
+// NewOrderTimer is the factory for OrderTimerImpl
+func NewOrderTimer() OrderTimer {
+	return &OrderTimerImpl{}
 }

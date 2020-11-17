@@ -1,7 +1,7 @@
 package autoreply
 
-// AutoReplier is the AI chatbot type
-type AutoReplier struct {
+// AutoReplierImpl is the AI chatbot type
+type AutoReplierImpl struct {
 	secretKey  string
 	builderURL string
 }

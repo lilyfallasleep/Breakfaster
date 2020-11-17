@@ -39,11 +39,11 @@ func (auth *AuthChecker) LineUIDAuth() gin.HandlerFunc {
 
 // AuthChecker is the authorization middleware type
 type AuthChecker struct {
-	empRepository *dao.EmployeeRepository
+	empRepository dao.EmployeeRepository
 }
 
 // NewAuthChecker is the factory for AuthChecker instance
-func NewAuthChecker(empRepository *dao.EmployeeRepository) *AuthChecker {
+func NewAuthChecker(empRepository dao.EmployeeRepository) *AuthChecker {
 	return &AuthChecker{
 		empRepository: empRepository,
 	}

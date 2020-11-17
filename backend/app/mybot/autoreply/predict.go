@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (ar *AutoReplier) getPrediction(body *ClovaRequest) (string, error) {
+func (ar *AutoReplierImpl) getPrediction(body *ClovaRequest) (string, error) {
 	result, err := ar.sendRequest(body)
 	if err != nil {
 		return "", err
@@ -15,7 +15,7 @@ func (ar *AutoReplier) getPrediction(body *ClovaRequest) (string, error) {
 }
 
 // Predict method predicts the intent of an user
-func (ar *AutoReplier) Predict(userMsg string) (string, error) {
+func (ar *AutoReplierImpl) Predict(userMsg string) (string, error) {
 	clovaRequest := &ClovaRequest{
 		Version:   "v2",
 		UserID:    constant.UserID,
@@ -33,9 +33,9 @@ func (ar *AutoReplier) Predict(userMsg string) (string, error) {
 	return ar.getPrediction(clovaRequest)
 }
 
-// NewAutoReplier is the factory for AutoReplier instance
-func NewAutoReplier(config *c.Config) *AutoReplier {
-	return &AutoReplier{
+// NewAutoReplier is the factory for AutoReplierImpl
+func NewAutoReplier(config *c.Config) AutoReplier {
+	return &AutoReplierImpl{
 		secretKey:  config.ClovaSecretKey,
 		builderURL: config.ClovaBuilderURL,
 	}

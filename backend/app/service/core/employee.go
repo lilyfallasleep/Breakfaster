@@ -10,15 +10,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// EmployeeService provides methods for manipulating employees
-type EmployeeService struct {
-	repository *dao.EmployeeRepository
+// EmployeeServiceImpl provides methods for manipulating employees
+type EmployeeServiceImpl struct {
+	repository dao.EmployeeRepository
 	cache      *cache.RedisCache
 	logger     *log.Entry
 }
 
 // GetEmployeeByLineUID service queries employee by line UID
-func (svc *EmployeeService) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmployee, error) {
+func (svc *EmployeeServiceImpl) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmployee, error) {
 	var empID string
 	found, err := svc.cache.Get(lineUID, &empID)
 	if err != nil {
@@ -45,7 +45,7 @@ func (svc *EmployeeService) GetEmployeeByLineUID(lineUID string) (*ss.JSONEmploy
 }
 
 // GetEmployeeByEmpID service queries employee by employee ID
-func (svc *EmployeeService) GetEmployeeByEmpID(empID string) (*ss.JSONEmployee, error) {
+func (svc *EmployeeServiceImpl) GetEmployeeByEmpID(empID string) (*ss.JSONEmployee, error) {
 	var lineUID string
 	found, err := svc.cache.Get(empID, &lineUID)
 	if err != nil {
@@ -72,7 +72,7 @@ func (svc *EmployeeService) GetEmployeeByEmpID(empID string) (*ss.JSONEmployee, 
 }
 
 // UpsertEmployeeByIDs service upserts employee by employee ID or line UID
-func (svc *EmployeeService) UpsertEmployeeByIDs(empID, lineUID string) error {
+func (svc *EmployeeServiceImpl) UpsertEmployeeByIDs(empID, lineUID string) error {
 	employee := &model.Employee{
 		EmpID:   empID,
 		LineUID: lineUID,
@@ -101,9 +101,9 @@ func (svc *EmployeeService) UpsertEmployeeByIDs(empID, lineUID string) error {
 	return nil
 }
 
-// NewEmployeeService is the factory for EmployeeService
-func NewEmployeeService(repository *dao.EmployeeRepository, cache *cache.RedisCache, config *config.Config) *EmployeeService {
-	return &EmployeeService{
+// NewEmployeeService is the factory for EmployeeServiceImpl
+func NewEmployeeService(repository dao.EmployeeRepository, cache *cache.RedisCache, config *config.Config) EmployeeService {
+	return &EmployeeServiceImpl{
 		repository: repository,
 		cache:      cache,
 		logger: config.Logger.ContextLogger.WithFields(log.Fields{

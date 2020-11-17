@@ -24,7 +24,7 @@ func BuildContainer() *dig.Container {
 	container.Provide(c.NewConfig)
 
 	container.Provide(db.NewDatabaseConnection)
-	container.Provide(cache.NewMemCache)
+	container.Provide(cache.NewLocalCache)
 	container.Provide(cache.NewRedisCache)
 
 	container.Provide(dao.NewFoodRepository)
@@ -43,7 +43,7 @@ func BuildContainer() *dig.Container {
 	container.Provide(mybot.NewWebhookService)
 	container.Provide(autoreply.NewAutoReplier)
 
-	container.Provide(messaging.NewMessage)
+	container.Provide(messaging.NewMessageController)
 
 	container.Provide(rv1.NewRouter)
 	container.Provide(middleware.NewAuthChecker)
