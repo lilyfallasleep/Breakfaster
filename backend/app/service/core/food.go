@@ -17,7 +17,7 @@ import (
 // FoodServiceImpl provides methods for manipulating foods
 type FoodServiceImpl struct {
 	repository dao.FoodRepository
-	cache      *cache.RedisCache
+	cache      cache.RedisCache
 	logger     *log.Entry
 }
 
@@ -75,7 +75,7 @@ func (svc *FoodServiceImpl) GetFoodAll(startDate, endDate string) (*ss.NestedFoo
 }
 
 // NewFoodService is the factory for FoodServiceImpl
-func NewFoodService(repository dao.FoodRepository, cache *cache.RedisCache, config *config.Config) FoodService {
+func NewFoodService(repository dao.FoodRepository, cache cache.RedisCache, config *config.Config) FoodService {
 	return &FoodServiceImpl{
 		repository: repository,
 		cache:      cache,

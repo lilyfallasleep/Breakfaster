@@ -10,8 +10,8 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// RedisCache is the redis cache client type
-type RedisCache struct {
+// RedisCacheImpl is the redis cache client type
+type RedisCacheImpl struct {
 	client     *redis.ClusterClient
 	ctx        context.Context
 	expiration time.Duration
@@ -62,8 +62,8 @@ type tmpPiplineCmd struct {
 	Cmd    interface{}
 }
 
-// NewRedisCache is the factory for MemCache instance
-func NewRedisCache(config *c.Config) (*RedisCache, error) {
+// NewRedisCache is the factory for RedisCacheImpl
+func NewRedisCache(config *c.Config) (RedisCache, error) {
 	client := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:         []string{config.RedisConfig.Addr},
 		Password:      config.RedisConfig.Password,
@@ -79,7 +79,7 @@ func NewRedisCache(config *c.Config) (*RedisCache, error) {
 		return nil, err
 	}
 	config.Logger.ContextLogger.WithField("type", "setup:redis").Info("successful Redis Connection: " + pong)
-	return &RedisCache{
+	return &RedisCacheImpl{
 		client:     client,
 		ctx:        ctx,
 		expiration: config.DefaultCacheExpiration,
@@ -87,7 +87,7 @@ func NewRedisCache(config *c.Config) (*RedisCache, error) {
 }
 
 // Get method returns true if the key already exists and set dst to the corresponding value
-func (rc *RedisCache) Get(key string, dst interface{}) (bool, error) {
+func (rc *RedisCacheImpl) Get(key string, dst interface{}) (bool, error) {
 	val, err := rc.client.Get(rc.ctx, key).Result()
 	if err == redis.Nil {
 		return false, nil
@@ -100,7 +100,7 @@ func (rc *RedisCache) Get(key string, dst interface{}) (bool, error) {
 }
 
 // Set method set a key-value pair
-func (rc *RedisCache) Set(key string, val interface{}) error {
+func (rc *RedisCacheImpl) Set(key string, val interface{}) error {
 	strVal, err := json.Marshal(val)
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (rc *RedisCache) Set(key string, val interface{}) error {
 }
 
 // Delete method deletes a key
-func (rc *RedisCache) Delete(key string) error {
+func (rc *RedisCacheImpl) Delete(key string) error {
 	if err := rc.client.Del(rc.ctx, key).Err(); err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (rc *RedisCache) Delete(key string) error {
 }
 
 // ExecPipeLine execute the given commands in a pipline
-func (rc *RedisCache) ExecPipeLine(cmds *[]Cmd) error {
+func (rc *RedisCacheImpl) ExecPipeLine(cmds *[]Cmd) error {
 	pipe := rc.client.Pipeline()
 	var tmpPiplineCmds []tmpPiplineCmd
 	for _, cmd := range *cmds {

@@ -1,7 +1,7 @@
 package cache
 
-// GeneralCache is the interface for memory caching
-type GeneralCache interface {
+// LocalCache is the interface for local memory caching
+type LocalCache interface {
 	Get(key string) (interface{}, bool)
 	Set(key string, val interface{})
 	Delete(key string)

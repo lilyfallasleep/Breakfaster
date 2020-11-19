@@ -13,7 +13,7 @@ import (
 // EmployeeServiceImpl provides methods for manipulating employees
 type EmployeeServiceImpl struct {
 	repository dao.EmployeeRepository
-	cache      *cache.RedisCache
+	cache      cache.RedisCache
 	logger     *log.Entry
 }
 
@@ -102,7 +102,7 @@ func (svc *EmployeeServiceImpl) UpsertEmployeeByIDs(empID, lineUID string) error
 }
 
 // NewEmployeeService is the factory for EmployeeServiceImpl
-func NewEmployeeService(repository dao.EmployeeRepository, cache *cache.RedisCache, config *config.Config) EmployeeService {
+func NewEmployeeService(repository dao.EmployeeRepository, cache cache.RedisCache, config *config.Config) EmployeeService {
 	return &EmployeeServiceImpl{
 		repository: repository,
 		cache:      cache,
