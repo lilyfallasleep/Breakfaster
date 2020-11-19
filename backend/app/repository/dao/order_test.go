@@ -110,7 +110,7 @@ func (s *OrderSuite) TestGetOrdersByLineUID() {
 		},
 	}
 	s.mock.ExpectQuery(
-		"^SELECT orders.date,foods.food_name FROM `orders` inner join foods on foods.id = orders.food_id inner join employees on employees.emp_id = orders.employee_emp_id WHERE \\(date BETWEEN \\? AND \\?\\) AND employees.line_uid = \\?$").
+		"^SELECT orders.date,foods.food_name FROM `orders` left join foods on foods.id = orders.food_id inner join employees on employees.emp_id = orders.employee_emp_id WHERE \\(date BETWEEN \\? AND \\?\\) AND employees.line_uid = \\?$").
 		WithArgs(start, end, lineUID).
 		WillReturnRows(sqlmock.NewRows(s.selectOrderColumns).
 			AddRow(orders[0].FoodName, orders[0].Date).
@@ -133,7 +133,7 @@ func (s *OrderSuite) TestGetOrderByEmpID() {
 	}
 
 	s.mock.ExpectQuery(
-		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` inner join foods on foods.id = orders.food_id WHERE date = \\? AND \\(orders.employee_emp_id = \\?\\) ORDER BY `orders`.`food_id` LIMIT 1$").
+		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` left join foods on foods.id = orders.food_id WHERE date = \\? AND \\(orders.employee_emp_id = \\?\\) ORDER BY `orders`.`food_id` LIMIT 1$").
 		WithArgs(date, empID).
 		WillReturnRows(sqlmock.NewRows(s.selectOrderWithEmployeeEmpIDColumns).
 			AddRow(order.FoodName, order.EmployeeEmpID, order.Date, order.Pick),
@@ -148,7 +148,7 @@ func (s *OrderSuite) TestGetOrderByEmpIDNotFound() {
 	date, _ := time.ParseInLocation(constant.DateFormat, "2020-10-10", time.Local)
 	empID := "LW99999"
 	s.mock.ExpectQuery(
-		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` inner join foods on foods.id = orders.food_id WHERE date = \\? AND \\(orders.employee_emp_id = \\?\\) ORDER BY `orders`.`food_id` LIMIT 1$").
+		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` left join foods on foods.id = orders.food_id WHERE date = \\? AND \\(orders.employee_emp_id = \\?\\) ORDER BY `orders`.`food_id` LIMIT 1$").
 		WithArgs(date, empID).
 		WillReturnRows(sqlmock.NewRows(s.selectOrderWithEmployeeEmpIDColumns))
 
@@ -168,7 +168,7 @@ func (s *OrderSuite) TestGetOrderByAccessCardNumber() {
 	}
 
 	s.mock.ExpectQuery(
-		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` inner join foods on foods.id = orders.food_id inner join employees on employees.emp_id = orders.employee_emp_id WHERE date = \\? AND employees.access_card_nbr = \\? ORDER BY `orders`.`food_id` LIMIT 1$").
+		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` left join foods on foods.id = orders.food_id inner join employees on employees.emp_id = orders.employee_emp_id WHERE date = \\? AND employees.access_card_nbr = \\? ORDER BY `orders`.`food_id` LIMIT 1$").
 		WithArgs(date, accessCardNbr).
 		WillReturnRows(sqlmock.NewRows(s.selectOrderWithEmployeeEmpIDColumns).
 			AddRow(order.FoodName, order.EmployeeEmpID, order.Date, order.Pick),
@@ -184,7 +184,7 @@ func (s *OrderSuite) TestGetOrderByAccessCardNumberNotFound() {
 	accessCardNbr := "1234567890"
 
 	s.mock.ExpectQuery(
-		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` inner join foods on foods.id = orders.food_id inner join employees on employees.emp_id = orders.employee_emp_id WHERE date = \\? AND employees.access_card_nbr = \\? ORDER BY `orders`.`food_id` LIMIT 1$").
+		"^SELECT orders.date,orders.employee_emp_id,orders.pick,foods.food_name FROM `orders` left join foods on foods.id = orders.food_id inner join employees on employees.emp_id = orders.employee_emp_id WHERE date = \\? AND employees.access_card_nbr = \\? ORDER BY `orders`.`food_id` LIMIT 1$").
 		WithArgs(date, accessCardNbr).
 		WillReturnRows(sqlmock.NewRows(s.selectOrderWithEmployeeEmpIDColumns))
 

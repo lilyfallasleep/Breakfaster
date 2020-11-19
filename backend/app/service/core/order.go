@@ -76,6 +76,9 @@ func (svc *OrderServiceImpl) GetOrderByEmpID(empID, rawDate string) (*ss.JSONOrd
 	if err != nil {
 		return &ss.JSONOrder{}, err
 	}
+	if order.FoodName == "" {
+		order.FoodName = constant.DeletedFoodName
+	}
 	return &ss.JSONOrder{
 		FoodName: order.FoodName,
 		EmpID:    order.EmployeeEmpID,
@@ -96,6 +99,9 @@ func (svc *OrderServiceImpl) GetOrderByAccessCardNumber(accessCardNumber, rawDat
 	order, err := svc.orderRepository.GetOrderByAccessCardNumber(accessCardNumber, date)
 	if err != nil {
 		return &ss.JSONOrder{}, err
+	}
+	if order.FoodName == "" {
+		order.FoodName = constant.DeletedFoodName
 	}
 	return &ss.JSONOrder{
 		FoodName: order.FoodName,

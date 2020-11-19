@@ -155,6 +155,10 @@ func GetConfirmOrderItems(orders *[]schema.SelectOrder, start, end time.Time) *D
 		start = start.AddDate(0, 0, 1)
 	}
 	for _, order := range *orders {
+		if order.FoodName == "" {
+			// note that this does not change the value in orders
+			order.FoodName = constant.DeletedFoodName
+		}
 		dailyOrders[getConfirmCardDate(order.Date)] = order.FoodName
 	}
 	return &dailyOrders

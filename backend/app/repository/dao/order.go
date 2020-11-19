@@ -21,6 +21,8 @@ type OrderRepositoryImpl struct {
 
 // CreateOrders creates an entry in orders table
 // if the primary key (employee_emp_id + date) duplicates, then update food id field
+// CreateOrders would fail if food_id or employee_emp_id does not exist
+// since we cannot add or update a child row (foreign key constraint)
 func (repo *OrderRepositoryImpl) CreateOrders(orders *[]model.Order) error {
 	if err := repo.db.Select("FoodID", "EmployeeEmpID", "Date", "UpdatedAt", "CreatedAt").Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "primary"}},
@@ -44,10 +46,13 @@ func (repo *OrderRepositoryImpl) DeleteOrdersByLineUID(lineUID string, start, en
 }
 
 // GetOrdersByLineUID retrieves orders according to the given line UID and time interval
+// If the referenced food is deleted, orders.food_id of that row will be set to null
+// and can still be selected if where statements fulfilled (left join foods)
+// but with FoodName = "" in the returned struct
 func (repo *OrderRepositoryImpl) GetOrdersByLineUID(lineUID string, start, end time.Time) (*[]schema.SelectOrder, error) {
 	var orders []schema.SelectOrder
 	if err := repo.db.Model(&model.Order{}).Select("orders.date", "foods.food_name").
-		Joins("inner join foods on foods.id = orders.food_id").
+		Joins("left join foods on foods.id = orders.food_id").
 		Joins("inner join employees on employees.emp_id = orders.employee_emp_id").
 		Where("date BETWEEN ? AND ?", start, end).Where("employees.line_uid = ?", lineUID).Scan(&orders).Error; err != nil {
 		repo.logger.Error(err)
@@ -60,7 +65,7 @@ func (repo *OrderRepositoryImpl) GetOrdersByLineUID(lineUID string, start, end t
 func (repo *OrderRepositoryImpl) GetOrderByEmpID(empID string, date time.Time) (*schema.SelectOrderWithEmployeeEmpID, error) {
 	var order schema.SelectOrderWithEmployeeEmpID
 	if err := repo.db.Model(&model.Order{}).Select("orders.date", "orders.employee_emp_id", "orders.pick", "foods.food_name").
-		Joins("inner join foods on foods.id = orders.food_id").
+		Joins("left join foods on foods.id = orders.food_id").
 		Where("date = ?", date).Where("orders.employee_emp_id = ?", empID).First(&order).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrOrderNotFound
@@ -75,7 +80,7 @@ func (repo *OrderRepositoryImpl) GetOrderByEmpID(empID string, date time.Time) (
 func (repo *OrderRepositoryImpl) GetOrderByAccessCardNumber(accessCardNumber string, date time.Time) (*schema.SelectOrderWithEmployeeEmpID, error) {
 	var order schema.SelectOrderWithEmployeeEmpID
 	if err := repo.db.Model(&model.Order{}).Select("orders.date", "orders.employee_emp_id", "orders.pick", "foods.food_name").
-		Joins("inner join foods on foods.id = orders.food_id").
+		Joins("left join foods on foods.id = orders.food_id").
 		Joins("inner join employees on employees.emp_id = orders.employee_emp_id").
 		Where("date = ?", date).Where("employees.access_card_nbr = ?", accessCardNumber).First(&order).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
