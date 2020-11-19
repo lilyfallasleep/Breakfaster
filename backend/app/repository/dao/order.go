@@ -47,8 +47,8 @@ func (repo *OrderRepositoryImpl) DeleteOrdersByLineUID(lineUID string, start, en
 func (repo *OrderRepositoryImpl) GetOrdersByLineUID(lineUID string, start, end time.Time) (*[]schema.SelectOrder, error) {
 	var orders []schema.SelectOrder
 	if err := repo.db.Model(&model.Order{}).Select("orders.date", "foods.food_name").
-		Joins("left join foods on foods.id = orders.food_id").
-		Joins("left join employees on employees.emp_id = orders.employee_emp_id").
+		Joins("inner join foods on foods.id = orders.food_id").
+		Joins("inner join employees on employees.emp_id = orders.employee_emp_id").
 		Where("date BETWEEN ? AND ?", start, end).Where("employees.line_uid = ?", lineUID).Scan(&orders).Error; err != nil {
 		repo.logger.Error(err)
 		return &[]schema.SelectOrder{}, exc.ErrGetOrder
@@ -60,7 +60,7 @@ func (repo *OrderRepositoryImpl) GetOrdersByLineUID(lineUID string, start, end t
 func (repo *OrderRepositoryImpl) GetOrderByEmpID(empID string, date time.Time) (*schema.SelectOrderWithEmployeeEmpID, error) {
 	var order schema.SelectOrderWithEmployeeEmpID
 	if err := repo.db.Model(&model.Order{}).Select("orders.date", "orders.employee_emp_id", "orders.pick", "foods.food_name").
-		Joins("left join foods on foods.id = orders.food_id").
+		Joins("inner join foods on foods.id = orders.food_id").
 		Where("date = ?", date).Where("orders.employee_emp_id = ?", empID).First(&order).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrOrderNotFound
@@ -75,8 +75,8 @@ func (repo *OrderRepositoryImpl) GetOrderByEmpID(empID string, date time.Time) (
 func (repo *OrderRepositoryImpl) GetOrderByAccessCardNumber(accessCardNumber string, date time.Time) (*schema.SelectOrderWithEmployeeEmpID, error) {
 	var order schema.SelectOrderWithEmployeeEmpID
 	if err := repo.db.Model(&model.Order{}).Select("orders.date", "orders.employee_emp_id", "orders.pick", "foods.food_name").
-		Joins("left join foods on foods.id = orders.food_id").
-		Joins("left join employees on employees.emp_id = orders.employee_emp_id").
+		Joins("inner join foods on foods.id = orders.food_id").
+		Joins("inner join employees on employees.emp_id = orders.employee_emp_id").
 		Where("date = ?", date).Where("employees.access_card_nbr = ?", accessCardNumber).First(&order).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &schema.SelectOrderWithEmployeeEmpID{}, exc.ErrOrderNotFound
