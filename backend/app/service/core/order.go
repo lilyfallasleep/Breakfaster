@@ -111,7 +111,7 @@ func (svc *OrderServiceImpl) SetPick(empID string, rawDate string) error {
 	if err != nil {
 		return exc.ErrDateFormat
 	}
-	if err := svc.orderRepository.UpdateOrderStatus(empID, date, true); err != nil {
+	if err := svc.orderRepository.UpdateOrderStatus(empID, date, true, time.Now().Unix()); err != nil {
 		return err
 	}
 	return nil

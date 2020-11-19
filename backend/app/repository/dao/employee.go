@@ -45,7 +45,7 @@ func (repo *EmployeeRepositoryImpl) GetLineUID(EmpID string) (string, error) {
 }
 
 // UpsertEmployeeByIDs creates an entry in employee table by employee ID and line UID (setting the rest null)
-// or replaces field(s) if there already exists same value on emp_id/line_id/access_card_nbr field,
+// or replaces field(s) if there already exists same value on emp_id/line_id field,
 // Note that if there exists orders that reference emp_id, then the update will fail
 // if we do not cascade foreign key on updates
 func (repo *EmployeeRepositoryImpl) UpsertEmployeeByIDs(employee *model.Employee) error {

@@ -88,9 +88,9 @@ func (repo *OrderRepositoryImpl) GetOrderByAccessCardNumber(accessCardNumber str
 }
 
 // UpdateOrderStatus updates the status of an order
-func (repo *OrderRepositoryImpl) UpdateOrderStatus(empID string, date time.Time, pick bool) error {
+func (repo *OrderRepositoryImpl) UpdateOrderStatus(empID string, date time.Time, pick bool, pickUpAt int64) error {
 	if err := repo.db.Model(&model.Order{}).Where("employee_emp_id = ? AND date = ?", empID, date).
-		Updates(model.Order{Pick: pick, PickUpAt: time.Now().Unix()}).Error; err != nil {
+		Updates(model.Order{Pick: pick, PickUpAt: pickUpAt}).Error; err != nil {
 		repo.logger.Error(err)
 		return exc.ErrUpdateOrderStatus
 	}

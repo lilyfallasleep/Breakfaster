@@ -25,5 +25,5 @@ type OrderRepository interface {
 	GetOrdersByLineUID(lineUID string, start, end time.Time) (*[]schema.SelectOrder, error)
 	GetOrderByEmpID(empID string, date time.Time) (*schema.SelectOrderWithEmployeeEmpID, error)
 	GetOrderByAccessCardNumber(accessCardNumber string, date time.Time) (*schema.SelectOrderWithEmployeeEmpID, error)
-	UpdateOrderStatus(empID string, date time.Time, pick bool) error
+	UpdateOrderStatus(empID string, date time.Time, pick bool, pickUpAt int64) error
 }
