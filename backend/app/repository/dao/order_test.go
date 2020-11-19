@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	//dblog "gorm.io/gorm/logger"
+	dblog "gorm.io/gorm/logger"
 )
 
 type OrderSuite struct {
@@ -55,7 +55,7 @@ func (s *OrderSuite) SetupSuite() {
 		Conn:                      db,
 		SkipInitializeWithVersion: true,
 	}), &gorm.Config{
-		//Logger: dblog.Default.LogMode(logger.Silent),
+		Logger: dblog.Default.LogMode(dblog.Silent),
 	})
 	require.NoError(s.T(), err)
 
