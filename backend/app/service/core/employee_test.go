@@ -25,7 +25,7 @@ type EmployeeSuite struct {
 	dummyConfig *config.Config
 }
 
-func TestEmployee(t *testing.T) {
+func TestEmployeeServiceImpl(t *testing.T) {
 	suite.Run(t, new(EmployeeSuite))
 }
 

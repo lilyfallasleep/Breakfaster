@@ -25,7 +25,7 @@ type FoodSuite struct {
 	dummyConfig *config.Config
 }
 
-func TestFood(t *testing.T) {
+func TestFoodServiceImpl(t *testing.T) {
 	suite.Run(t, new(FoodSuite))
 }
 

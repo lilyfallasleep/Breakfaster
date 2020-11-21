@@ -32,7 +32,7 @@ type FoodSuite struct {
 	end               time.Time
 }
 
-func TestFood(t *testing.T) {
+func TestFoodRepositoryImpl(t *testing.T) {
 	suite.Run(t, new(FoodSuite))
 }
 

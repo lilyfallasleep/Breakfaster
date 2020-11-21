@@ -30,7 +30,7 @@ type EmployeeSuite struct {
 	lineUID                 string
 }
 
-func TestEmployee(t *testing.T) {
+func TestEmployeeRepositoryImpl(t *testing.T) {
 	suite.Run(t, new(EmployeeSuite))
 }
 

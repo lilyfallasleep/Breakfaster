@@ -32,7 +32,7 @@ type OrderSuite struct {
 	selectOrderWithEmployeeEmpIDColumns []string
 }
 
-func TestOrder(t *testing.T) {
+func TestOrderRepositoryImpl(t *testing.T) {
 	suite.Run(t, new(OrderSuite))
 }
 
