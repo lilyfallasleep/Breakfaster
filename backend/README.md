@@ -18,6 +18,14 @@ On the Clova ChatBot dashboard, create a numbers of question-answer pairs. Curre
 ## Development
 For development, you can start the DB and Redis containers only by executing:
 ```bash
+export DB_USER=ming
+export DB_USER_PASSWD=password
+export DB_ROOT_PASSWD=password
+export DB_NAME=breakfaster
+export REDIS_CLUSTER_IP=$(ifconfig | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}" \
+    | grep -v 127.0.0.1 | awk '{ print $2 }' | cut -f2 -d: | head -n1)
+export REDIS_PASSWD=pass.123
+
 docker-compose up db redis-cluster-creator \
     redis-node1 redis-node2 redis-node3 redis-node4 redis-node5 redis-node6
 ```

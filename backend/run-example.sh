@@ -12,7 +12,7 @@ export BOT_VERSION=v1
 export ORDER_PAGE_URI=https://liff.line.me/myLiffURI
 export MAX_DB_IDLE_CONNS=10
 export MAX_DB_OPEN_CONNS=100
-export DB_DSN='ming:password@tcp(db:3306)/breakfaster?charset=utf8mb4&parseTime=True&loc=Local'
+export DB_DSN='ming:password@tcp(db:3306)/breakfaster?charset=utf8mb4&parseTime=True&loc=Local' # should change host to 127.0.0.1 for local development
 export GIN_MODE=debug
 export LOG_PATH=server.log
 export DEFAULT_CACHE_EXPIRATION=86400
@@ -20,7 +20,7 @@ export CLEAN_CACHE_INTERVAL=86400
 export CLOVA_SECRET_KEY=myClovaSecretKey
 export CLOVA_BUILDER_URL=https://myClovaChatBotEndpoint
 
-export REDIS_ADDR=redis-node1:7000
+export REDIS_ADDR=redis-node1:7000 # should change host to 127.0.0.1 for local development
 export REDIS_PASSWD=pass.123
 export REDIS_POOL_SIZE=10
 export REDIS_MAX_RETRIES=3
