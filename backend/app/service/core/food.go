@@ -26,7 +26,7 @@ const (
 )
 
 func getFoodsCacheKey(startDate, endDate string) string {
-	return fmt.Sprintf("%s-%s-%s", foodsCacheKeyBase, startDate, endDate)
+	return fmt.Sprintf("%s:%s:%s", foodsCacheKeyBase, startDate, endDate)
 }
 
 // GetFoodAll returns all foods between the given date (includingly)

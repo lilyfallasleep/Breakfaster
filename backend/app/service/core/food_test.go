@@ -2,92 +2,152 @@ package core
 
 import (
 	"breakfaster/config"
-	"breakfaster/infrastructure/cache"
-	"breakfaster/repository/dao"
+	"breakfaster/mocks/mock_cache"
+	"breakfaster/mocks/mock_dao"
+	exc "breakfaster/pkg/exception"
+	rs "breakfaster/repository/schema"
 	ss "breakfaster/service/schema"
-	"reflect"
+	"io/ioutil"
 	"testing"
+	"time"
 
+	"github.com/go-test/deep"
+	"github.com/golang/mock/gomock"
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
-func Test_getFoodsCacheKey(t *testing.T) {
-	type args struct {
-		startDate string
-		endDate   string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getFoodsCacheKey(tt.args.startDate, tt.args.endDate); got != tt.want {
-				t.Errorf("getFoodsCacheKey() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+type FoodSuite struct {
+	suite.Suite
+	mockCtrl    *gomock.Controller
+	dummyConfig *config.Config
 }
 
-func TestFoodServiceImpl_GetFoodAll(t *testing.T) {
-	type fields struct {
-		repository dao.FoodRepository
-		cache      cache.RedisCache
-		logger     *log.Entry
-	}
-	type args struct {
-		startDate string
-		endDate   string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *ss.NestedFood
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			svc := &FoodServiceImpl{
-				repository: tt.fields.repository,
-				cache:      tt.fields.cache,
-				logger:     tt.fields.logger,
-			}
-			got, err := svc.GetFoodAll(tt.args.startDate, tt.args.endDate)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FoodServiceImpl.GetFoodAll() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FoodServiceImpl.GetFoodAll() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+func TestFood(t *testing.T) {
+	suite.Run(t, new(FoodSuite))
 }
 
-func TestNewFoodService(t *testing.T) {
-	type args struct {
-		repository dao.FoodRepository
-		cache      cache.RedisCache
-		config     *config.Config
+func (s *FoodSuite) SetupSuite() {
+	// discard all log outputs
+	log.SetOutput(ioutil.Discard)
+
+	s.mockCtrl = gomock.NewController(s.T())
+	s.dummyConfig = NewDummyConfig()
+}
+
+func (s *FoodSuite) TearDownSuite() {
+	s.mockCtrl.Finish()
+}
+
+func GetTestFoodData(startDate, endDate string, start, end time.Time) ([]rs.SelectFood, ss.NestedFood) {
+	returnSelectFood := []rs.SelectFood{
+		rs.SelectFood{
+			ID:             1,
+			FoodName:       "apple",
+			FoodSupplier:   "ming",
+			PicURL:         "pic.com",
+			SupplyDatetime: start,
+		},
+		rs.SelectFood{
+			ID:             2,
+			FoodName:       "orange",
+			FoodSupplier:   "ming",
+			PicURL:         "pic2.com",
+			SupplyDatetime: start,
+		},
+		rs.SelectFood{
+			ID:             3,
+			FoodName:       "banana",
+			FoodSupplier:   "ming",
+			PicURL:         "pic3.com",
+			SupplyDatetime: end,
+		},
 	}
-	tests := []struct {
-		name string
-		args args
-		want FoodService
-	}{
-		// TODO: Add test cases.
+	finalNestedFood := ss.NestedFood{
+		startDate: []ss.JSONFood{
+			ss.JSONFood{
+				ID:       returnSelectFood[0].ID,
+				Name:     returnSelectFood[0].FoodName,
+				Supplier: returnSelectFood[0].FoodSupplier,
+				PicURL:   returnSelectFood[0].PicURL,
+			},
+			ss.JSONFood{
+				ID:       returnSelectFood[1].ID,
+				Name:     returnSelectFood[1].FoodName,
+				Supplier: returnSelectFood[1].FoodSupplier,
+				PicURL:   returnSelectFood[1].PicURL,
+			},
+		},
+		endDate: []ss.JSONFood{
+			ss.JSONFood{
+				ID:       returnSelectFood[2].ID,
+				Name:     returnSelectFood[2].FoodName,
+				Supplier: returnSelectFood[2].FoodSupplier,
+				PicURL:   returnSelectFood[2].PicURL,
+			},
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewFoodService(tt.args.repository, tt.args.cache, tt.args.config); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewFoodService() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	return returnSelectFood, finalNestedFood
+}
+
+func (s *FoodSuite) TestGetAllFoodInTimeIntervalCacheMissed() {
+	startDate, endDate, start, end := GetTestDateTimeInterval()
+	inputNestedFood := make(ss.NestedFood)
+	returnSelectFood, finalNestedFood := GetTestFoodData(startDate, endDate, start, end)
+
+	mockRedisCache := mock_cache.NewMockRedisCache(s.mockCtrl)
+	mockFoodRepository := mock_dao.NewMockFoodRepository(s.mockCtrl)
+
+	mockRedisCache.EXPECT().
+		Get(getFoodsCacheKey(startDate, endDate), &inputNestedFood).
+		Return(false, nil)
+	mockFoodRepository.EXPECT().
+		GetFoodAll(start, end).
+		Return(&returnSelectFood, nil).Times(1)
+	mockRedisCache.EXPECT().
+		Set(getFoodsCacheKey(startDate, endDate), &finalNestedFood).
+		Return(nil)
+
+	foodSvc := NewFoodService(mockFoodRepository, mockRedisCache, s.dummyConfig)
+	res, err := foodSvc.GetFoodAll(startDate, endDate)
+
+	require.NoError(s.T(), err)
+	require.Nil(s.T(), deep.Equal(&finalNestedFood, res))
+}
+
+func (s *FoodSuite) TestGetAllFoodInTimeIntervalNotFound() {
+	startDate, endDate, start, end := GetTestDateTimeInterval()
+	inputNestedFood := make(ss.NestedFood)
+
+	mockRedisCache := mock_cache.NewMockRedisCache(s.mockCtrl)
+	mockFoodRepository := mock_dao.NewMockFoodRepository(s.mockCtrl)
+
+	mockRedisCache.EXPECT().
+		Get(getFoodsCacheKey(startDate, endDate), &inputNestedFood).
+		Return(false, nil)
+	mockFoodRepository.EXPECT().
+		GetFoodAll(start, end).
+		Return(&[]rs.SelectFood{}, exc.ErrFoodNotFound).Times(1)
+
+	foodSvc := NewFoodService(mockFoodRepository, mockRedisCache, s.dummyConfig)
+	_, err := foodSvc.GetFoodAll(startDate, endDate)
+	assert.EqualError(s.T(), err, exc.ErrFoodNotFound.Error())
+}
+
+func (s *FoodSuite) TestGetAllFoodInTimeIntervalCached() {
+	startDate, endDate, _, _ := GetTestDateTimeInterval()
+	inputNestedFood := make(ss.NestedFood)
+
+	mockRedisCache := mock_cache.NewMockRedisCache(s.mockCtrl)
+	mockFoodRepository := mock_dao.NewMockFoodRepository(s.mockCtrl)
+
+	mockRedisCache.EXPECT().
+		Get(getFoodsCacheKey(startDate, endDate), &inputNestedFood).
+		Return(true, nil)
+
+	foodSvc := NewFoodService(mockFoodRepository, mockRedisCache, s.dummyConfig)
+	_, err := foodSvc.GetFoodAll(startDate, endDate)
+	require.NoError(s.T(), err)
 }

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"breakfaster/config"
 	"breakfaster/mybot"
 	exc "breakfaster/pkg/exception"
 	"breakfaster/pkg/ordertime"
@@ -9,6 +10,8 @@ import (
 	"breakfaster/service/constant"
 	ss "breakfaster/service/schema"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // OrderServiceImpl provides methods for manipulating orders
@@ -18,6 +21,7 @@ type OrderServiceImpl struct {
 	bot             *mybot.BreakFaster
 	pusher          *mybot.BreakFastPusher
 	timer           ordertime.OrderTimer
+	logger          *log.Entry
 }
 
 // SendOrderConfirmMessage sends an order confirmation message to the employee
@@ -32,6 +36,7 @@ func (svc *OrderServiceImpl) SendOrderConfirmMessage(empID string, start, end ti
 		return exc.ErrGetOrderWhenConfirm
 	}
 	if err := svc.pusher.SendDirectFlex(lineUID, "確認訂單", confirmCard); err != nil {
+		svc.logger.Error(err)
 		return exc.ErrSendMsg
 	}
 	return nil
@@ -125,12 +130,15 @@ func (svc *OrderServiceImpl) SetPick(empID string, rawDate string) error {
 
 // NewOrderService is the factory for OrderServiceImpl
 func NewOrderService(orderRepository dao.OrderRepository, empSvc EmployeeService,
-	bot *mybot.BreakFaster, pusher *mybot.BreakFastPusher, timer ordertime.OrderTimer) OrderService {
+	bot *mybot.BreakFaster, pusher *mybot.BreakFastPusher, timer ordertime.OrderTimer, config *config.Config) OrderService {
 	return &OrderServiceImpl{
 		orderRepository: orderRepository,
 		empSvc:          empSvc,
 		bot:             bot,
 		pusher:          pusher,
 		timer:           timer,
+		logger: config.Logger.ContextLogger.WithFields(log.Fields{
+			"type": "svc:order",
+		}),
 	}
 }
