@@ -32,6 +32,9 @@ pretest:
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=service/core/interface.go -destination=mocks/mock_service/mock_service.go
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=pkg/ordertime/interface.go -destination=mocks/mock_ordertime/mock_ordertime.go
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=infrastructure/cache/redis_interface.go -destination=mocks/mock_cache/mock_cache_redis.go
+	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=messaging/interface.go -destination=mocks/mock_messaging/mock_messaging.go
+	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=mybot/interface.go -destination=mocks/mock_mybot/mock_mybot.go
+	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=mybot/autoreply/interface.go -destination=mocks/mock_autoreply/mock_autoreply.go
 
 clean:
 	$(GOCLEAN)
