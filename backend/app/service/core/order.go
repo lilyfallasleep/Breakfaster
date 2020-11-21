@@ -18,8 +18,8 @@ import (
 type OrderServiceImpl struct {
 	orderRepository dao.OrderRepository
 	empSvc          EmployeeService
-	bot             *mybot.BreakFaster
-	pusher          *mybot.BreakFastPusher
+	bot             mybot.BreakFastBot
+	pusher          mybot.BreakFastPushBot
 	timer           ordertime.OrderTimer
 	logger          *log.Entry
 }
@@ -130,7 +130,7 @@ func (svc *OrderServiceImpl) SetPick(empID string, rawDate string) error {
 
 // NewOrderService is the factory for OrderServiceImpl
 func NewOrderService(orderRepository dao.OrderRepository, empSvc EmployeeService,
-	bot *mybot.BreakFaster, pusher *mybot.BreakFastPusher, timer ordertime.OrderTimer, config *config.Config) OrderService {
+	bot mybot.BreakFastBot, pusher mybot.BreakFastPushBot, timer ordertime.OrderTimer, config *config.Config) OrderService {
 	return &OrderServiceImpl{
 		orderRepository: orderRepository,
 		empSvc:          empSvc,

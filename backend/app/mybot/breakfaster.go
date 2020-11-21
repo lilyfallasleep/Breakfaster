@@ -36,14 +36,14 @@ func NewLineBot(config *c.Config) (*linebot.Client, error) {
 }
 
 // NewBreakFastPusher is a factory for message pusher instance
-func NewBreakFastPusher(bot *linebot.Client) (*BreakFastPusher, error) {
+func NewBreakFastPusher(bot *linebot.Client) (BreakFastPushBot, error) {
 	return &BreakFastPusher{
 		bot: bot,
 	}, nil
 }
 
 // NewBreakFaster is a factory for webhook instance
-func NewBreakFaster(bot *linebot.Client, svc *WebhookService) (*BreakFaster, error) {
+func NewBreakFaster(bot *linebot.Client, svc *WebhookService) (BreakFastBot, error) {
 	return &BreakFaster{
 		bot: bot,
 		svc: svc,

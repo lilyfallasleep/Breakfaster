@@ -8,7 +8,7 @@ import (
 
 // Router is the router type
 type Router struct {
-	Bot      *mybot.BreakFaster
+	Bot      mybot.BreakFastBot
 	timer    ordertime.OrderTimer
 	foodSvc  core.FoodService
 	orderSvc core.OrderService
@@ -16,7 +16,7 @@ type Router struct {
 }
 
 // NewRouter is a factory for router instance
-func NewRouter(bot *mybot.BreakFaster, timer ordertime.OrderTimer,
+func NewRouter(bot mybot.BreakFastBot, timer ordertime.OrderTimer,
 	foodSvc core.FoodService, orderSvc core.OrderService, empSvc core.EmployeeService) *Router {
 	return &Router{
 		Bot:      bot,

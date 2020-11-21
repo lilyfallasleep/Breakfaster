@@ -6,7 +6,6 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
-// ReplyFlex is a method for sending back flex message
 func (app *BreakFaster) replyFlex(replyToken string, title string, flexMsgFunc func() linebot.FlexContainer, disableCache bool) error {
 	var flexMsg linebot.FlexContainer
 	if disableCache {
