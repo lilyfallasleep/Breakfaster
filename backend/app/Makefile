@@ -24,7 +24,7 @@ doc:
 test: pretest runtest
 runtest:
 	$(GOTEST) -v ./...
-pretest:
+pretest: mock
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=repository/dao/interface.go -destination=mocks/mock_dao/mock_dao.go
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=service/core/interface.go -destination=mocks/mock_service/mock_service.go
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=pkg/ordertime/interface.go -destination=mocks/mock_ordertime/mock_ordertime.go
