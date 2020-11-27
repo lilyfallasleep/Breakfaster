@@ -1,6 +1,6 @@
 package mybot
 
-// Predict returns message according to the given prediction
+// Predict returns message according to the given text
 func (app *BreakFaster) Predict(replyToken, lineUID, text string) error {
 	prediction, err := app.svc.ar.Predict(text)
 	if err != nil {
