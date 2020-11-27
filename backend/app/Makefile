@@ -34,7 +34,7 @@ pretest: mock
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=mybot/autoreply/interface.go -destination=mocks/mock_autoreply/mock_autoreply.go
 
 swag:
-	$(GOGET) github.com/swaggo/swag/cmd/swag@v1.6.7
+	GO111MODULE=on $(GOGET) github.com/swaggo/swag/cmd/swag@v1.6.7
 mock:
 	GO111MODULE=on $(GOGET) github.com/golang/mock/mockgen@v1.4.4
 
