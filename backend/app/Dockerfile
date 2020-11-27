@@ -4,7 +4,7 @@ RUN apk update && apk add alpine-sdk git && rm -rf /var/cache/apk/*
 RUN mkdir -p /app
 WORKDIR /app
 COPY Makefile .
-RUN make deps
+RUN make swag
 
 COPY go.mod go.sum ./
 RUN go mod download

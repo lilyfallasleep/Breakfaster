@@ -20,9 +20,6 @@ messaging:
 	$(GOBUILD) -o $(BINARY_NAME_MESSAGING) -v $(BINARY_PATH_MESSAGING)/main.go
 doc:
 	$(shell $(GOCMD) env GOPATH)/bin/swag init -g $(BINARY_PATH_SERVER)/main.go
-deps:
-	$(GOGET) -u github.com/swaggo/swag/cmd/swag
-	GO111MODULE=on $(GOGET) github.com/golang/mock/mockgen@v1.4.4
 
 test: pretest runtest
 runtest:
@@ -35,6 +32,11 @@ pretest:
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=messaging/interface.go -destination=mocks/mock_messaging/mock_messaging.go
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=mybot/interface.go -destination=mocks/mock_mybot/mock_mybot.go
 	$(shell $(GOCMD) env GOPATH)/bin/mockgen -source=mybot/autoreply/interface.go -destination=mocks/mock_autoreply/mock_autoreply.go
+
+swag:
+	$(GOGET) -u github.com/swaggo/swag/cmd/swag@v1.6.7
+mock:
+	GO111MODULE=on $(GOGET) github.com/golang/mock/mockgen@v1.4.4
 
 clean:
 	$(GOCLEAN)

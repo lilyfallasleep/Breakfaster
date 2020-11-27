@@ -126,7 +126,8 @@ info:
 paths:
   /api/v1/employee:
     post:
-      description: Insert an employee. If the employee ID or line UID exists, update the corresponding field
+      description: Insert an employee. If the employee ID or line UID exists, update
+        the corresponding field
       parameters:
       - description: Add Employee
         in: body
@@ -340,7 +341,8 @@ paths:
       - Order
   /api/v1/orders:
     post:
-      description: Create orders of next week for an employee. Overwite an order if it already exists
+      description: Create orders of next week for an employee. Overwite an order if
+        it already exists
       parameters:
       - description: Line UID Authorization
         in: header
