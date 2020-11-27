@@ -1,5 +1,12 @@
-pipeline:
-  backend:
-    image: golang
-    commands:
-      - echo "backend testing"
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: backend-test
+  image: golang:latest
+  # The commands are executed inside the root directory of the git repository
+  commands:
+  - cd backend/app
+  - go mod download
+  - make test
