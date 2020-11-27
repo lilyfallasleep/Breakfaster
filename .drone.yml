@@ -4,9 +4,33 @@ name: default
 
 steps:
 - name: backend-test
+  pull: if-not-exists
   image: golang:latest
   # The commands are executed inside the root directory of the git repository
   commands:
   - cd backend/app
   - go mod download
   - make test
+
+- name: notify
+  image: plugins/slack
+  settings:
+    webhook:
+      # specified on the Drone server web interface
+      from_secret: webhook
+  when:
+    status:
+    - failure
+    - success
+  depends_on:
+    - backend-test
+
+trigger:
+  branch:
+  - main
+  event:
+    include:
+    - push
+    - pull_request
+    - rollback
+    
