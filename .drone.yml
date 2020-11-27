@@ -9,6 +9,7 @@ platform:
 x-build-docker-image: &x-build-docker-image
   image: plugins/docker
   settings:
+    insecure: true
     registry: 140.112.31.162:80
     custom_labels:
     - 'BUILD_NUMBER=${DRONE_BUILD_NUMBER}'
@@ -60,5 +61,5 @@ steps:
     - failure
     - success
   depends_on:
-    - backend-test
+    - build-image
     
