@@ -44,7 +44,7 @@ steps:
 - name: build-image
   <<: *x-build-docker-image
   settings:
-    repo: 140.112.31.162:80/test
+    repo: 140.112.31.162:80/test/breakfaster
     dockerfile: backend/app/Dockerfile
     context: backend/app
   depends_on:
