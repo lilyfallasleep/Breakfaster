@@ -45,7 +45,7 @@ steps:
   <<: *x-build-docker-image
   settings:
     # repo: harbor.pdlab.csie.ntu.edu.tw:80/test/breakfaster
-    epo: harbor.pdlab.csie.ntu.edu.tw/test/breakfaster
+    repo: harbor.pdlab.csie.ntu.edu.tw/test/breakfaster
     dockerfile: backend/app/Dockerfile
     context: backend/app
   depends_on:
