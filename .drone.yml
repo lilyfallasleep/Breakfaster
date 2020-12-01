@@ -10,7 +10,7 @@ x-build-docker-image: &x-build-docker-image
   image: plugins/docker
   settings:
     insecure: true
-    registry: 140.112.31.162:80
+    registry: harbor.pdlab.csie.ntu.edu.tw:80
     custom_labels:
     - 'BUILD_NUMBER=${DRONE_BUILD_NUMBER}'
     - 'BUILD_SHA=${DRONE_COMMIT_SHA}'
@@ -44,7 +44,7 @@ steps:
 - name: build-image
   <<: *x-build-docker-image
   settings:
-    repo: 140.112.31.162:80/test/breakfaster
+    repo: harbor.pdlab.csie.ntu.edu.tw:80/test/breakfaster
     dockerfile: backend/app/Dockerfile
     context: backend/app
   depends_on:
