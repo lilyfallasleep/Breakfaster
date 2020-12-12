@@ -9,8 +9,8 @@ platform:
 x-build-docker-image: &x-build-docker-image
   image: plugins/docker
   settings:
-    # insecure: true
-    registry: harbor.pdlab.csie.ntu.edu.tw
+    insecure: true
+    registry: harbor.pdlab.csie.ntu.edu.tw:80
     custom_labels:
     - 'BUILD_NUMBER=${DRONE_BUILD_NUMBER}'
     - 'BUILD_SHA=${DRONE_COMMIT_SHA}'
@@ -21,8 +21,6 @@ x-build-docker-image: &x-build-docker-image
       from_secret: harbor_username
     password:
       from_secret: harbor_password
-  environment:
-    HOME: "/tmp"
 
 trigger:
   branch:
@@ -46,8 +44,8 @@ steps:
 - name: build-image
   <<: *x-build-docker-image
   settings:
-    # repo: harbor.pdlab.csie.ntu.edu.tw:80/test/breakfaster
-    repo: harbor.pdlab.csie.ntu.edu.tw/test/breakfaster
+    repo: harbor.pdlab.csie.ntu.edu.tw:80/test/breakfaster
+    #repo: harbor.pdlab.csie.ntu.edu.tw/test/breakfaster
     dockerfile: backend/app/Dockerfile
     context: backend/app
   depends_on:
