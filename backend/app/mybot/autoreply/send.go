@@ -22,7 +22,7 @@ func (ar *AutoReplierImpl) sendRequest(body *ClovaRequest) (*ClovaResponse, erro
 
 	req, err := http.NewRequest("POST", ar.builderURL, bytes.NewBuffer(jsonstr))
 	req.Header.Set("X-NCP-CHATBOT_SIGNATURE", signature)
-	req.Header.Set("Content-Type", "application/json;UTF-8")
+	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
