@@ -11,7 +11,7 @@ chmod +x run-example.sh
 ./run-example.sh
 ```
 
-Wait for a while and the Breakfaster will be up and running!
+Now wait for a while and the Breakfaster will be up and running!
 
 You can visit `http://<host-ip:port>/api/v1/doc/index.html` for API documentation. Note that the API documentation is only available when `GIN_MODE=debug`.
 ## Model Training
