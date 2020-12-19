@@ -10,7 +10,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN make doc build
+RUN make doc build-linux
 
 FROM alpine:latest
 
