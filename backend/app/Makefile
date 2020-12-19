@@ -13,7 +13,7 @@ BINARY_PATH_MESSAGING=./cmd/messaging
 BINARY_NAME_MESSAGING=$(BINARY_PATH_MESSAGING)/messaging
 BINARY_UNIX_MESSAGING=$(BINARY_NAME_MESSAGING)_unix
 
-all: deps doc messaging build
+all: swag doc messaging build
 build:
 	$(GOBUILD) -o $(BINARY_NAME_SERVER) -v $(BINARY_PATH_SERVER)/main.go
 messaging:
