@@ -14,7 +14,6 @@ chmod +x run-example.sh
 Now wait for a while and the Breakfaster will be up and running!
 
 You can visit `http://<host-ip:port>/api/v1/doc/index.html` for API documentation. Note that the API documentation is only available when `GIN_MODE=debug`.
-
 ## Model Training
 On the Clova ChatBot dashboard, create a numbers of question-answer pairs. Current answers should include: `問題回報`, `取消訂單`, `點餐紀錄`, `規則`. See more details in [Chat Bot Custom API Documentation](https://apidocs.ncloud.com/en/ai-application-service/chatbot/chatbot/).
 ## Development
