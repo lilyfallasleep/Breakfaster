@@ -17,7 +17,6 @@ FROM alpine:latest
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=builder /app/cmd/server/breakfaster /app/script/entrypoint.sh /app/script/wait-for-it.sh ./
-RUN apk add --no-cache bash
-RUN chmod +x wait-for-it.sh entrypoint.sh
+RUN apk add --no-cache bash && chmod +x wait-for-it.sh entrypoint.sh
 
 ENTRYPOINT ["./wait-for-it.sh", "db:3306", "--", "./wait-for-it.sh", "redis-node1:7000", "--", "./entrypoint.sh"]
