@@ -1,6 +1,5 @@
-FROM golang:1.14.8-alpine3.11 AS builder
+FROM golang:1.14.8 AS builder
 
-RUN apk update && apk add alpine-sdk git && rm -rf /var/cache/apk/*
 RUN mkdir -p /app
 WORKDIR /app
 COPY Makefile .
@@ -14,8 +13,7 @@ RUN make doc build-linux
 
 FROM alpine:latest
 
-RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
-
+# RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=builder /app/cmd/server/breakfaster /app/script/entrypoint.sh /app/script/wait-for-it.sh ./
