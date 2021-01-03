@@ -1,5 +1,5 @@
 # Breakfaster - A Breakfast Ordering System @LINE
-[![Build Status](http://morris.csie.ntu.edu.tw:5601/api/badges/minghsu0107/Breakfaster/status.svg)](http://morris.csie.ntu.edu.tw:5601/minghsu0107/Breakfaster)
+[![Build Status](https://drone.pdlab.csie.ntu.edu.tw/api/badges/minghsu0107/Breakfaster/status.svg)](https://drone.pdlab.csie.ntu.edu.tw/minghsu0107/Breakfaster)
 ## Usage
 First, make sure that Docker and Docker-Compose are installed on your machine.
 
